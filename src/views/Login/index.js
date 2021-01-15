@@ -12,14 +12,21 @@ import { RootContext } from 'utils';
 export default () => {
   const formRef = useRef();
   const { setContext } = useContext(RootContext)
-
+  
   const _login = async () => {
     const form = await formRef.current.get();
+    if(!form) {
+      return
+    }
+
     const response = await apiLogin(form)
     if (response.status === 200) {
       setContext({
         isLogin: true
       })
+    }
+    else {
+      alert("Sai tên đăng nhập hoặc mật khẩu!")
     }
   }
 

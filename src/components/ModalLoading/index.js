@@ -1,5 +1,5 @@
 import { Modal, Spinner } from '@ui-kitten/components';
-import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
+import React, { forwardRef, useImperativeHandle, useState } from 'react';
 import { View } from 'react-native';
 import styles from './styles'
 

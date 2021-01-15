@@ -13,6 +13,7 @@ const AsyncButton = ({
   ...props
 }) => {
   const [loading, setLoading] = useState(false)
+  
   const _onPress = async () => {
     if (typeof onPress === 'function') {
       setLoading(true)
