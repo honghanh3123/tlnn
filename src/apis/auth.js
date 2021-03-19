@@ -20,7 +20,6 @@ export const apiLogin = async (form) => {
       status: 403
     }
   } catch (error) {
-    console.log(error);
     return error.response
   }
 }

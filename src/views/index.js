@@ -39,9 +39,11 @@ const LearnIcon = (props) => (
 
 const TestStackNavigation = () => (
   <Stack.Navigator>
-    <Stack.Screen name="VoiceTest" component={VoiceTest} />
-    <Stack.Screen name={TESTS} component={Tests} />
-    <Stack.Screen name={STARTTEST} component={TestDetail}/>
+    {/* <Stack.Screen name="VoiceTest" component={VoiceTest} /> */}
+    <Stack.Screen name={TESTS} component={Tests} options= {{
+      header: BlankHeader
+    }} />
+    <Stack.Screen name={STARTTEST} component={TestDetail} />
   </Stack.Navigator>
 )
 
@@ -49,7 +51,7 @@ const ScreenBottomTab = [
   {
     name: TESTS,
     component: TestStackNavigation,
-    icon: TestIcon
+    icon: TestIcon,
   },
   {
     name: LEARN,
@@ -77,7 +79,6 @@ const BottomTabBar = ({
   state
 }) => {
   const _onSelect = index => {
-    // console.log(state)
     navigation.navigate(state.routeNames[index])
   }
 
@@ -123,7 +124,7 @@ export default () => {
         setContext({ isLogin: true })
       }
     } catch (error) {
-      console.log(error)
+      return error
     }
   }
 

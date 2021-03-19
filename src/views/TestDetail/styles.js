@@ -1,13 +1,16 @@
-import { StyleSheet } from "react-native";
-import { block } from "react-native-reanimated";
-import { Autocomplete } from "@ui-kitten/components";
+import { StyleSheet, Dimensions } from "react-native";
+
+const screenWidth = Dimensions.get("screen").width
+const screenHeight = Dimensions.get("screen").height
 
 export default StyleSheet.create({
   wrapper: {
+    position: "relative",
     display: "flex",
     alignItems: "center",
-    justifyContent: "center",
-    margin: 5
+    margin: 5,
+    width: screenWidth,
+    height: screenHeight
   },
 
   wrapperTitle: {
@@ -16,11 +19,11 @@ export default StyleSheet.create({
     fontSize: 16
   },
 
-  question: {
-    fontSize: 22,
-    fontWeight: "bold",
-    marginBottom: 50
-  },
+  // question: {
+  //   fontSize: 22,
+  //   fontWeight: "bold",
+  //   marginBottom: 50
+  // },
 
   wrapTopic: {
     borderStyle: "solid",

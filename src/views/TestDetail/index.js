@@ -1,42 +1,119 @@
-import React, { Fragment } from 'react';
-import { Button, Avatar } from '@ui-kitten/components';
+import React, { Fragment, useState, useEffect } from 'react';
+import { Button, Avatar, Spinner } from '@ui-kitten/components';
 import { View, Text, StyleSheet, TouchableNativeFeedback } from 'react-native';
 import styles from './styles';
-
+import { getQuestions } from 'service/question';
+import Cat from 'views/TemplateQuestion/Order';
+import Choice from 'views/TemplateQuestion/Choice';
+import Order from "views/TemplateQuestion/Order";
+import Associate from "views/TemplateQuestion/Associate";
+import Math from "views/TemplateQuestion/Match";
+import Test from 'datafix/Test';
+import { apiQuestionTest } from "apis/questionTest";
 export default () => {
-  const _onPress = () => {
-    
+  const [dataQuestion, setDataQuestion] = useState({
+    baseUrl: "",
+    token: "",
+    typeQuestion: "",
+    question: "",
+    answers: ""
+  })
+  const [_qtiClass, setQtiClass] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [questionIndex, setQuestionIndex] = useState(1);
+  useEffect(() => {
+    getQuestion();
+  }, [questionIndex])
+
+  // lấy dữ liệu câu hỏi
+  const getQuestion = async () => {
+    try {
+      setLoading(true);
+      let paramTest = await getQuestions(`item-${questionIndex}`);
+      const response = await apiQuestionTest({
+        ...paramTest
+      });
+      _readQuestion(response.data);
+      setLoading(false)
+    } catch (error) {
+      setLoading(false)
+      return error;
+    }
+  }
+
+  // đọc câu hỏi
+  const _readQuestion = (data) => {
+    try {
+      dataQuestion.baseUrl = data['baseUrl'];
+      dataQuestion.token = data['token'];
+      let elements = data.itemData.data.body.elements;
+      let qtiClass = Object.values(elements)[0].qtiClass;
+      let question = Object.values(elements)[0].prompt.body;
+      let choices = Object.values(elements)[0].choices;
+      let objChoises = Object.values(choices);
+      let answers = [];
+      objChoises.forEach(item => {
+        let answer = {};
+        answer.value = item.body.body;
+        answer.identifier = item.identifier;
+        answer.qtiClass = item.qtiClass;
+        answers.push(answer);
+      });
+      // dataQuestion.question = question;
+      // dataQuestion.answers = answers;
+      setDataQuestion({
+        baseUrl: data['baseUrl'],
+        token: data['token'],
+        typeQuestion: "",
+        question: question,
+        answers: answers
+      });
+      setQtiClass(qtiClass)
+    } catch (error) {
+      return error;
+    }
+  }
+
+  // next question
+  const handleNextQuestion = () => {
+    setQuestionIndex(questionIndex + 1);
   }
 
   return (
     <View style={styles.wrapper}>
       <Text style={styles.wrapperTitle}>
-        Câu 1/15
-    </Text>
-      <Text style={styles.question}>Chọn cái ấm nước</Text>
-      <TouchableNativeFeedback onPress={_onPress}>
-        <View style={{ display: "flex", flexDirection: "row", marginBottom: 10 }}>
-          <View style={styles.wrapTopic}>
-            <Avatar size='giant' source={require('../../assets/images/cai_am.png')} />
-          </View>
-          <View style={{ width: 20 }}></View>
-          <View style={styles.wrapTopic}>
-            <Avatar size='giant' source={require('../../assets/images/cai_bat.png')} />
-          </View>
-        </View>
-      </TouchableNativeFeedback>
-      <View style={{ display: "flex", flexDirection: "row", marginBottom: 10 }}>
-        <View style={styles.wrapTopic}>
-          <Avatar size='giant' source={require('../../assets/images/cai_phich.png')} />
-        </View>
-        <View style={{ width: 20 }}></View>
-        <View style={styles.wrapTopic}>
-          <Avatar size='giant' source={require('../../assets/images/item.png')} />
-        </View>
+        {`Câu ${questionIndex}`}
+      </Text>
+      <View style={{ width: "100%", height: "65%" }}>
+        {
+          loading ? (
+            <View style={{ width: "100%", height: "100%", alignItems: "center", justifyContent: "center" }}>
+              <Spinner />
+            </View>
+          ) : (
+          _qtiClass == "choiceInteraction" 
+            ? <Choice dataQuestion={dataQuestion} 
+              onNextQuestion={handleNextQuestion}
+              loading={loading}
+              questionIndex={questionIndex}/>
+            : _qtiClass == "orderInteraction" 
+            ? <Order dataQuestion={dataQuestion} 
+              onNextQuestion={handleNextQuestion}
+              loading={loading}
+              questionIndex={questionIndex}
+              />
+            : _qtiClass == "gapMatchInteraction"
+            ? <Associate dataQuestion={dataQuestion} 
+              onNextQuestion={handleNextQuestion}
+              loading={loading}
+              questionIndex={questionIndex}/>
+            : <Math dataQuestion={dataQuestion} 
+              onNextQuestion={handleNextQuestion}
+              loading={loading}
+              questionIndex={questionIndex}/>
+            )
+        }
       </View>
-      <View>
-        <Button>Đồng ý</Button>
-    </View>
     </View>
   )
 }

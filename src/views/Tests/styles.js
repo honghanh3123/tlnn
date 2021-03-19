@@ -7,11 +7,12 @@ export default StyleSheet.create({
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    margin: 5
+    flex: 1
   },
 
+
   wrapperTitle: {
-    marginTop: 40,
+    marginTop: 30,
     marginBottom: 20,
     fontSize: 28,
     fontWeight: "bold"
@@ -19,7 +20,9 @@ export default StyleSheet.create({
 
   inlineButton: {
     display: "flex",
-    flexDirection: "row"
+    flexDirection: "row",
+    justifyContent: "space-around",
+    width: "60%"
   },
 
   btnNotDo: {
@@ -41,7 +44,9 @@ export default StyleSheet.create({
   },
 
   wrapperTest: {
-    marginTop: 50
+    marginTop: 50,
+    width: "100%",
+    flex: 1
   },
 
   testItem: {
@@ -49,15 +54,17 @@ export default StyleSheet.create({
     borderColor: "#d0d0d0",
     borderWidth: 1,
     borderRadius: 10,
-    width: 370,
+    marginHorizontal: 24,
     display: "flex",
     flexDirection: "row",
-    height: 110,
-    marginBottom: 12
+    // minHeight: 100,
+    marginBottom: 12,
+    position: "relative",
+    padding: 15
   },
 
   testBorderLeftGreen: {
-    height: 106,
+    // minHeight: 116,
     width: 8,
     backgroundColor: "#45BA0E",
     marginTop: 2,
@@ -71,7 +78,7 @@ export default StyleSheet.create({
   },
 
   testBorderLeftBlue: {
-    height: 106,
+    // minHeight: 146,
     width: 8,
     backgroundColor: "#0E47BA",
     marginTop: 2,
@@ -85,7 +92,7 @@ export default StyleSheet.create({
   },
 
   testBorderLeftRed: {
-    height: 106,
+    // minHeight: 146,
     width: 8,
     backgroundColor: "#FF5811",
     marginTop: 2,
@@ -100,17 +107,27 @@ export default StyleSheet.create({
 
   testContent: {
     marginLeft: 15,
-    marginTop: 12
+    position: "relative",
+    width: "90%"
   },
 
   testTime: {
-    marginTop: 8,
-    marginBottom: 8
+    // marginTop: 8,
+    // marginBottom: 8
   },
 
   createTime: {
-    marginTop: 12,
-    left: 100,
-    color: "#838FA6"
+    // marginTop: 12,
+    // left: 100,
+    // color: "#838FA6"
+  },
+
+  btnFooter: {
+    height: 30,
+    width: 100,
+    marginBottom: 10,
+    textAlign: "right"
+    // top: 10,
+    // left: 200
   }
 })
