@@ -19,24 +19,45 @@ export default ({
   const _onPress = () => {
     onNextQuestion();
   }
-  
+
   const handlePressItem = (item, numberSelected) => () => {
-    const _selected = {...selected}
-    
-    if(Object.keys(selected) < numberSelected){
-      if(selected[item.value]) {
+    const _selected = { ...selected }
+    console.log("\n\n\n item", item, "numberSelected", numberSelected);
+    console.log("Object.keys(selected) < numberSelected", Object.keys(selected).length, numberSelected);
+    console.log("selected[item.value]", selected[item.value]);
+    if (Object.keys(selected).length < numberSelected) {
+      if (selected[item.value]) {
         delete _selected[item.value]
       }
       else {
         _selected[item.value] = item
       }
-    }else if (Object.keys(selected) == numberSelected) {
+    } else if (Object.keys(selected).length == numberSelected) {
       delete _selected[item.value];
       _selected[item.value] = item;
     }
+    console.log("_selected 1", _selected);
     setSelected(_selected)
   }
-  const selectdValues = useMemo(() => Object.keys(selected), [selected])
+
+  const _onPressResult = (value) => () => {
+    const _selected = { ...selected }
+    if (value) {
+      delete _selected[value];
+    }
+    setSelected(_selected)
+  }
+  console.log("dataQuestion.suggestQuestion", dataQuestion.suggestQuestion);
+  let arrQuestion = [];
+  let suggestQuestion = dataQuestion.suggestQuestion.toString().replace(/^(\<p\>)(.+)(\<\/p\>)$/g, (...args) => args[2]); 
+  suggestQuestion = suggestQuestion.replace("<p>", "").replace("</p>", "");
+  let arrSugQues = suggestQuestion.split(/\{\{\w+\}\}/g);
+  arrSugQues.forEach(element => {
+    arrQuestion.push(element.trim());
+  });
+  
+  console.log("arrSugQues", arrQuestion);
+  const selectdValues = useMemo(() => Object.keys(selected), [selected]);
   return (
     <View style={styles.wrapper}>
       <Text style={styles.question}>{dataQuestion.question || ""}</Text>
@@ -64,15 +85,30 @@ export default ({
         </View>
         <View style={styles.orderResult}>
           {
-            selectdValues && selectdValues.length > 0 ? selectdValues.map((item, index) => (
+            arrQuestion && arrQuestion.length > 0 ? arrQuestion.map((item, index) => (
               <View key={index} style={{ marginRight: 5, marginBottom: 5 }}>
-                <Button
-                  size="small"
-                  onPress={_onPressResult(item.value)}
-                  appearance='outline'
-                >{
-                    () => <Text>{item.value}</Text>
-                  }</Button>
+                {
+                  (index < arrQuestion.length - 1) ? (
+                    <View style={{display: "flex", justifyContent: "center", flexDirection: "row", alignItems: "center"}}>
+                      <Text style={{marginRight: 4}}>{item}</Text>
+                      <Button
+                      size="tiny"
+                      onPress={_onPressResult(selectdValues[index])}
+                      appearance='outline'  
+                      >
+                        {
+                          () => <Text style={{minWidth: 50}}>
+                            {console.log("selectdValues[index]", selectdValues[index])}
+                            {selectdValues[index] ? selectdValues[index] : ""}
+                          </Text>
+                        }
+                      </Button>
+                    </View>
+                  )
+                  : (
+                    <Text>{item}</Text>
+                  )
+                }
               </View>
             )) :
               null

@@ -3,7 +3,7 @@ import { NavigationContainer } from '@react-navigation/native'
 import { createStackNavigator } from '@react-navigation/stack'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { TESTS, LOGIN, WORDS, ME, LEARN, STARTTEST } from 'consts/screens';
+import { TESTS, LOGIN, WORDS, ME, LEARN, STARTTEST, RESULTS, RESULTDETAIL, LEARNDETAIL } from 'consts/screens';
 import Login from 'views/Login';
 import { RootContext } from 'utils';
 import { BottomNavigation, BottomNavigationTab, Icon } from '@ui-kitten/components';
@@ -16,6 +16,10 @@ import Profile from './Profile';
 import StartTest from './TestDetail';
 import TestDetail from './TestDetail';
 import VoiceTest from './VoiceTest';
+import Results from './Results';
+import ResultDetail from './ResultDetail';
+import LearnDetail from './LearnDetail';
+import LearnItem from './LearnItem';
 
 const Stack = createStackNavigator();
 const BottomTab = createBottomTabNavigator();
@@ -40,10 +44,20 @@ const LearnIcon = (props) => (
 const TestStackNavigation = () => (
   <Stack.Navigator>
     {/* <Stack.Screen name="VoiceTest" component={VoiceTest} /> */}
-    <Stack.Screen name={TESTS} component={Tests} options= {{
+    <Stack.Screen name={TESTS} component={Tests} options={{
       header: BlankHeader
     }} />
     <Stack.Screen name={STARTTEST} component={TestDetail} />
+    <Stack.Screen name={RESULTS} component={Results} />
+    <Stack.Screen name={RESULTDETAIL} component={ResultDetail} />
+  </Stack.Navigator>
+)
+
+const LearnStackNavigation = () => (
+  <Stack.Navigator>
+    <Stack.Screen name={LEARN} component={Learn}></Stack.Screen>
+    <Stack.Screen {...LearnDetail} />
+    <Stack.Screen {...LearnItem} />
   </Stack.Navigator>
 )
 
@@ -55,7 +69,7 @@ const ScreenBottomTab = [
   },
   {
     name: LEARN,
-    component: Learn,
+    component: LearnStackNavigation,
     icon: LearnIcon
   },
   {

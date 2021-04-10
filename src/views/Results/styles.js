@@ -44,9 +44,8 @@ export default StyleSheet.create({
   },
 
   wrapperTest: {
-    marginTop: 50,
-    width: "100%",
-    flex: 1
+    marginTop: 10,
+    width: "100%"
   },
 
   testItem: {

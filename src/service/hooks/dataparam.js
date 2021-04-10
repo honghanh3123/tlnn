@@ -17,10 +17,6 @@ const getConfigs = async (uri = "http%3A%2F%2Faigle.blife.ai%2FAigle.rdf%23i1611
   let testDefinition = dataParams.testDefinition;
   let testCompilation = dataParams.testCompilation;
   let serviceCallId = dataParams.serviceCallId;
-  console.log("dataparam", dataParams.testDefinition);
-  console.log("dataparam", dataParams.testCompilation);
-  console.log("dataparam", dataParams.serviceCallId);
-  console.log("dataparam", dataParams);
   return {
     testDefinition,
     testCompilation,

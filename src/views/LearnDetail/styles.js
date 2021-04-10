@@ -7,8 +7,10 @@ const screenHeight = Dimensions.get("screen").height
 
 export default StyleSheet.create({
   wrapper: {
-    width: screenWidth,
-    height: screenHeight
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 20
   },
 
   wrapperTitle: {
@@ -37,6 +39,5 @@ export default StyleSheet.create({
   textTopic: {
     fontSize: 16,
     marginTop: 4
-  },
-
+  }
 })

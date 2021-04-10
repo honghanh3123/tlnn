@@ -16,11 +16,12 @@ export default () => {
     token: "",
     typeQuestion: "",
     question: "",
-    answers: ""
+    answers: "",
+    suggestQuestion: ""
   })
   const [_qtiClass, setQtiClass] = useState({});
   const [loading, setLoading] = useState(true);
-  const [questionIndex, setQuestionIndex] = useState(1);
+  const [questionIndex, setQuestionIndex] = useState(4);
   useEffect(() => {
     getQuestion();
   }, [questionIndex])
@@ -44,11 +45,13 @@ export default () => {
   // đọc câu hỏi
   const _readQuestion = (data) => {
     try {
+      
       dataQuestion.baseUrl = data['baseUrl'];
       dataQuestion.token = data['token'];
       let elements = data.itemData.data.body.elements;
       let qtiClass = Object.values(elements)[0].qtiClass;
       let question = Object.values(elements)[0].prompt.body;
+      let suggestQuestion = Object.values(elements)[0].body.body;
       let choices = Object.values(elements)[0].choices;
       let objChoises = Object.values(choices);
       let answers = [];
@@ -66,7 +69,8 @@ export default () => {
         token: data['token'],
         typeQuestion: "",
         question: question,
-        answers: answers
+        answers: answers,
+        suggestQuestion: suggestQuestion ? suggestQuestion : ""
       });
       setQtiClass(qtiClass)
     } catch (error) {

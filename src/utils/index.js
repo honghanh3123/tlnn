@@ -32,3 +32,14 @@ export const generateForm = (formConfig) => {
   })
   return form
 }
+
+export const getFileTail = (contentType) => {
+  switch (true) {
+    case contentType === "audio/mpeg":
+      return "mp3"
+    case /image/g.test(contentType):
+      return contentType.split("/").pop()
+    default:
+      break;
+  }
+}

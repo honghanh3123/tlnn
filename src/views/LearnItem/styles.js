@@ -7,6 +7,9 @@ const screenHeight = Dimensions.get("screen").height
 
 export default StyleSheet.create({
   wrapper: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
     width: screenWidth,
     height: screenHeight
   },
@@ -39,4 +42,18 @@ export default StyleSheet.create({
     marginTop: 4
   },
 
+  wrapImg: {
+    width: "100%", 
+    display: "flex", 
+    flexDirection: "row", 
+    flexWrap: "wrap", 
+    justifyContent: "center"
+  },
+
+  scrollViewImg: {
+    width: "100%", 
+    padding: 10, 
+    maxHeight: screenHeight - 200,
+    bottom: 100
+  }
 })
