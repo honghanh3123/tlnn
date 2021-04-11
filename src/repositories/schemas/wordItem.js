@@ -4,8 +4,10 @@ export default {
   name: SHEMAS_NAME.WORDITEM,
   properties: {
     _id: "string",
-    name: "string",
-    status: "string?",
+    label: "string",
+    linkAudio: "string",
+    linkImg: "string",
+    path: "string"
   },
-  primaryKey: "_id"
+  primaryKey: "_id",
 }

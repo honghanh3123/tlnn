@@ -3,7 +3,7 @@ import { SHEMAS_NAME } from "consts/schema";
 export default {
   name: SHEMAS_NAME.WORDDIR,
   properties: {
-    "_id": "int",
+    "_id": "string",
     "label": "string",
     "count": "int",
     "type": "string",

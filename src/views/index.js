@@ -30,7 +30,7 @@ const PersonIcon = (props) => (
 );
 
 const WordIcon = (props) => (
-  <Icon {...props} name='text-outline' />
+  <Icon {...props} name='award-outline' /> //text-outline
 );
 
 const TestIcon = (props) => (

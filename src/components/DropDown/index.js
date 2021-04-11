@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import styles from './styles';
 import { LEARNITEM } from 'consts/screens';
+import { ceil } from 'lodash';
 export default ({ item, onClickFunction, itemIndex }) => {
   //Custom Component for the Expandable List
   const [layoutHeight, setLayoutHeight] = useState(0);
@@ -53,15 +54,19 @@ export default ({ item, onClickFunction, itemIndex }) => {
           height: layoutHeight,
           overflow: 'hidden'
         }}>
-        {/*Content under the header of the Expandable List Item*/}
-        {item.childrens.length > 0 && item.childrens.map((itemSubcategory, key) => (
+        {item.childrens.length > 0 && item.childrens.map((child, key) => (
           <TouchableOpacity
             key={key}
             style={styles.content}
-            onPress={() => _onPress(itemSubcategory, item.label)}>
-            <Text style={styles.text}>
-              {key}. {itemSubcategory.label}
-            </Text>
+            onPress={() => _onPress(child, item.label)}>
+              <View style={{display: "flex", justifyContent: "space-between", alignItems: "center", flexDirection: "row"}}>
+                <Text style={styles.text}>
+                {child.label}
+              </Text>
+              <Text style={styles.text}>
+                {child.count} từ
+              </Text>
+              </View>
             <View style={styles.separator} />
           </TouchableOpacity>
         ))}

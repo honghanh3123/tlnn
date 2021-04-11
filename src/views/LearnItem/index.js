@@ -1,4 +1,6 @@
 import React, { Fragment, useState, useEffect, useRef } from 'react';
+import 'react-native-get-random-values';
+import { v4 as uuidv4 } from 'uuid';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { View, Text, Image, ScrollView, TouchableNativeFeedback } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -11,7 +13,7 @@ import { getItemData, getLinkFile } from "apis/getItemLearn";
 import fs from "react-native-fs"
 import CardFlip from 'react-native-card-flip';
 import Sound from 'react-native-sound';
-import {create, read} from "repositories";
+import { create, read, deleteRealm, deleteById, update, bulkCreate } from "repositories";
 import { SHEMAS_NAME } from "consts/schema";
 
 const Card = ({
@@ -35,7 +37,7 @@ const Card = ({
         firstLink.pop();
         return firstLink.join(".") === pathFile;
       });
-      
+
       playSound(file.path);
       //return `data:image/${file.path.split(".").pop()};base64,${file}`;
     } catch (error) {
@@ -69,7 +71,7 @@ const Card = ({
         <View
           style={{ backgroundColor: "#0072bc", width: width, height: height, display: "flex", justifyContent: "center", alignItems: "center" }}
         >
-          <Text style={{color: "#fff", fontSize: 18}}>{label}</Text>
+          <Text style={{ color: "#fff", fontSize: 18 }}>{label}</Text>
         </View>
       </TouchableNativeFeedback>
     </CardFlip>
@@ -80,7 +82,7 @@ const LearnItem = () => {
   const route = useRoute();
   const [loading, setLoading] = useState(true);
   const [dataStudy, setDataStudy] = useState([]);
-  const [responseFile, setResponseFile] = useState([]);
+  const [learnItems, setLearnItems] = useState([]);
   const [imgBase64s, setImgBase64s] = useState([]);
 
   useEffect(() => {
@@ -110,35 +112,43 @@ const LearnItem = () => {
   // lấy dữ liệu học tập
   const loadDataDetail = async (param) => {
     try {
-      setLoading(true);
-      const endPoint = "http://aigle.blife.ai/taoItems/Items/getOntologyData";
-      const cookie = await AsyncStorage.getItem("@cookie");
-      const response = await Axios.get(endPoint, {
-        headers: {
-          Cookie: cookie,
-          'X-Requested-With': 'XMLHttpRequest'
-        },
-        params: {
-          'extension': "taoItems",
-          'perspective': "items",
-          'section': "manage_items",
-          'classUri': param.attributes["data-uri"],
-          'hideInstances': 0,
-          'filter': '*',
-          'offset': 0,
-          'limit': 30,
-          'selected': "http_2_aigle_0_blife_0_ai_1_Aigle_0_rdf_3_i161762021751478855"
-        }
-      })
+      let data = await read(SHEMAS_NAME.WORDITEM);
+      data = data.filter((item) => item.path == `/${he.decode(route.params.labelParent)}/${he.decode(route.params.title)}`);
+      let _learnItems = [];
+      console.log("data read", data);
+      if (data && data.length > 0) {
+        console.log("has data");
+        setLoading(false);
+        _learnItems = [...data];
+        setLearnItems(data);
+      } else {
+        setLoading(true);
+        console.log("no data");
+        const endPoint = "http://aigle.blife.ai/taoItems/Items/getOntologyData";
+        const cookie = await AsyncStorage.getItem("@cookie");
+        const response = await Axios.get(endPoint, {
+          headers: {
+            Cookie: cookie,
+            'X-Requested-With': 'XMLHttpRequest'
+          },
+          params: {
+            'extension': "taoItems",
+            'perspective': "items",
+            'section': "manage_items",
+            'classUri': param.attributes["data-uri"],
+            'hideInstances': 0,
+            'filter': '*',
+            'offset': 0,
+            'limit': 30,
+            'selected': "http_2_aigle_0_blife_0_ai_1_Aigle_0_rdf_3_i161762021751478855"
+          }
+        })
 
-      let promisesGetItemData = await read(SHEMAS_NAME.WORDITEM);
-      console.log("promisesGetItemData", promisesGetItemData);
-      if(!promisesGetItemData) {
-        promisesGetItemData = await _readLearnDetail(response.data.tree);
+        _learnItems = await _readLearnDetail(response.data.tree);
       }
-      console.log("promisesGetItemData1", promisesGetItemData);
-      createFileInDevice(promisesGetItemData);
-      setLoading(false);
+      console.log("_learnItems", _learnItems);
+      // tạo file ảnh, audio trên thiết bị
+      createFileInDevice(_learnItems);
     } catch (error) {
       setLoading(false);
       console.log("error loadDataDetail", error);
@@ -163,33 +173,37 @@ const LearnItem = () => {
           return getDataFile(item.attributes["data-uri"])
         })
         setDataStudy(_dataStudy);
-        await create(SHEMAS_NAME.WORDITEM, promisesGetItemData);
-        return promisesGetItemData;
+        const learnItems = await Promise.all(promisesGetItemData);
+        const bulkCreateds = await bulkCreate(SHEMAS_NAME.WORDITEM, learnItems.map(item => ({
+          ...item,
+          _id: uuidv4(),
+          path: `/${he.decode(route.params.labelParent)}/${he.decode(route.params.title)}`
+        })))
+        console.log("learnItems bulkCreateds", bulkCreateds);
+        return learnItems;
       }
     } catch (error) {
       console.log("Error read file", error);
     }
   }
 
-  const createFileInDevice = async () => {
+  const createFileInDevice = async (learnItems) => {
     try {
-      const _responseFile = await Promise.all(promisesGetItemData);
-        // save file base64
-        for (var i = 0; i < _responseFile.length; i++) {
-          const singleLinkFile = _responseFile[i];
-          // save file image
-          const tailBase64Img = await getLinkFile(singleLinkFile.linkImg);
-          await fs.mkdir(fs.DocumentDirectoryPath + `/images/${he.decode(route.params.labelParent)}/${he.decode(route.params.title)}`);
-          await fs.writeFile(fs.DocumentDirectoryPath + `/images/${he.decode(route.params.labelParent)}/${he.decode(route.params.title)}/${singleLinkFile.label}.${tailBase64Img.tail}`, tailBase64Img.base64, "base64")
-          // save file audio
+      // save file base64
+      for (var i = 0; i < learnItems.length; i++) {
+        const singleLinkFile = learnItems[i];
+        // save file image
+        const tailBase64Img = await getLinkFile(singleLinkFile.linkImg);
+        await fs.mkdir(fs.DocumentDirectoryPath + `/images/${he.decode(route.params.labelParent)}/${he.decode(route.params.title)}`);
+        await fs.writeFile(fs.DocumentDirectoryPath + `/images/${he.decode(route.params.labelParent)}/${he.decode(route.params.title)}/${singleLinkFile.label}.${tailBase64Img.tail}`, tailBase64Img.base64, "base64")
+        // save file audio
 
-          const tailBase64Audio = await getLinkFile(singleLinkFile.linkAudio)
-          await fs.mkdir(fs.DocumentDirectoryPath + `/audios/${he.decode(route.params.labelParent)}/${he.decode(route.params.title)}`);
-          await fs.writeFile(fs.DocumentDirectoryPath + `/audios/${he.decode(route.params.labelParent)}/${he.decode(route.params.title)}/${singleLinkFile.label}.${tailBase64Audio.tail}`, tailBase64Audio.base64, "base64")
-
-        }
-
-        setResponseFile(_responseFile)
+        const tailBase64Audio = await getLinkFile(singleLinkFile.linkAudio)
+        await fs.mkdir(fs.DocumentDirectoryPath + `/audios/${he.decode(route.params.labelParent)}/${he.decode(route.params.title)}`);
+        await fs.writeFile(fs.DocumentDirectoryPath + `/audios/${he.decode(route.params.labelParent)}/${he.decode(route.params.title)}/${singleLinkFile.label}.${tailBase64Audio.tail}`, tailBase64Audio.base64, "base64")
+      }
+      setLearnItems(learnItems);
+      setLoading(false);
     } catch (error) {
       console.log("Error createFileIndevice", error);
     }
@@ -240,14 +254,14 @@ const LearnItem = () => {
                   imgBase64s
                     .filter(img => img !== "")
                     .map((item, index) => (
-                      <Card 
-                      key={index} 
-                      uri={item["uri"]} 
-                      label={item["label"]} 
-                      width={150} 
-                      height={150} 
-                      pathDir={fs.DocumentDirectoryPath + `/audios/${he.decode(route.params.labelParent)}/${he.decode(route.params.title)}`} 
-                      pathFile={fs.DocumentDirectoryPath + `/audios/${he.decode(route.params.labelParent)}/${he.decode(route.params.title)}/${item["label"]}`} />
+                      <Card
+                        key={index}
+                        uri={item["uri"]}
+                        label={item["label"]}
+                        width={150}
+                        height={150}
+                        pathDir={fs.DocumentDirectoryPath + `/audios/${he.decode(route.params.labelParent)}/${he.decode(route.params.title)}`}
+                        pathFile={fs.DocumentDirectoryPath + `/audios/${he.decode(route.params.labelParent)}/${he.decode(route.params.title)}/${item["label"]}`} />
                     ))
                 }
               </View>
