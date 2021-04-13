@@ -7,7 +7,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Axios from 'axios';
 import { LEARNITEM } from 'consts/screens';
 import he from "he"
-import { Button, Avatar, Spinner, List, ListItem } from '@ui-kitten/components';
+import { Button, Avatar, Spinner, List, ListItem, Icon } from '@ui-kitten/components';
 import styles from './styles';
 import { getItemData, getLinkFile } from "apis/getItemLearn";
 import fs from "react-native-fs"
@@ -15,7 +15,11 @@ import CardFlip from 'react-native-card-flip';
 import Sound from 'react-native-sound';
 import { create, read, deleteRealm, deleteById, update, bulkCreate } from "repositories";
 import { SHEMAS_NAME } from "consts/schema";
-
+import { reject } from 'lodash';
+import Video from 'react-native-video';
+import
+MediaControls, { PLAYER_STATES }
+  from 'react-native-media-controls';
 const Card = ({
   uri, label, width, height, pathDir, pathFile
 }) => {
@@ -78,31 +82,199 @@ const Card = ({
   )
 }
 
+const ObjectStudy = ({
+  _learnItems, labelParent, title
+}) => {
+
+  const [dataObject, setDataObject] = useState([]);
+  const ref = useRef();
+  const [index, setIndex] = useState(0);
+  useEffect(() => {
+    handleLoadVideo();
+  }, [])
+
+  const videoPlayer = useRef(null);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [isFullScreen, setIsFullScreen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [paused, setPaused] = useState(false);
+  const [
+    playerState, setPlayerState
+  ] = useState(PLAYER_STATES.PLAYING);
+  const [screenType, setScreenType] = useState('content');
+
+  const onSeek = (seek) => {
+    //Handler for change in seekbar
+    videoPlayer.current.seek(seek);
+  };
+
+  const onPaused = (playerState) => {
+    //Handler for Video Pause
+    setPaused(!paused);
+    setPlayerState(playerState);
+  };
+
+  const onReplay = () => {
+    //Handler for Replay
+    setPlayerState(PLAYER_STATES.PLAYING);
+    videoPlayer.current.seek(0);
+  };
+
+  const onProgress = (data) => {
+    // Video Player will progress continue even if it ends
+    if (!isLoading && playerState !== PLAYER_STATES.ENDED) {
+      setCurrentTime(data.currentTime);
+    }
+  };
+
+  const onLoad = (data) => {
+    setDuration(data.duration);
+    setIsLoading(false);
+  };
+
+  const onLoadStart = (data) => setIsLoading(true);
+
+  const onEnd = () => setPlayerState(PLAYER_STATES.ENDED);
+
+  const onError = () => alert('Oh! ', error);
+
+  const exitFullScreen = () => {
+    alert('Exit full screen');
+  };
+
+  const enterFullScreen = () => { };
+
+  const onFullScreen = () => {
+    setIsFullScreen(isFullScreen);
+    if (screenType == 'content') setScreenType('cover');
+    else setScreenType('content');
+  };
+
+  const renderToolbar = () => (
+    <View>
+      <Text style={styles.toolbar}> toolbar </Text>
+    </View>
+  );
+
+  const onSeeking = (currentTime) => setCurrentTime(currentTime);
+
+  const handleLoadVideo = async () => {
+    let data = _learnItems.filter(item => item.linkVideo != "");
+    console.log("data", data);
+    const result = await Promise.all(data.map(async item => {
+      const pathDir = fs.DocumentDirectoryPath + `/videos/${he.decode(labelParent)}/${he.decode(title)}`;
+      const pathFile = fs.DocumentDirectoryPath + `/videos/${he.decode(labelParent)}/${he.decode(title)}/${item.label}`;
+      const isExistFile = await fs.exists(pathDir);
+      if (isExistFile) {
+        console.log("isExistFile");
+        const files = await fs.readDir(pathDir);
+        const file = files.find(file => {
+          var firstLink = file.path.split(".");
+          firstLink.pop();
+          return firstLink.join(".") === pathFile;
+        });
+        item.uri = file.path;
+        return item;
+      }
+    }));
+    console.log("promiseData", result);
+    setDataObject(result);
+  }
+
+  return (
+    <View style={styles.wrapper}>
+      {
+        dataObject && dataObject.length > 0 && (
+          <View style={{ flex: 1 }}>
+            <Text>{dataObject[0].label}</Text>
+            {/* <View style={{flex: 1}}>
+              <Video
+                source={{ uri: dataObject[0].uri }}   // Can be a URL or a local file.
+                ref={ref}
+                style={styles.backgroundVideo}>
+              </Video>
+            </View> */}
+            <View style={{ flex: 1 }}>
+              <Video
+                onEnd={onEnd}
+                onLoad={onLoad}
+                onLoadStart={onLoadStart}
+                onProgress={onProgress}
+                paused={paused}
+                ref={videoPlayer}
+                resizeMode={screenType}
+                onFullScreen={isFullScreen}
+                source={{
+                  uri: dataObject[0].uri
+                }}
+                style={styles.mediaPlayer}
+                volume={10}
+              />
+              <MediaControls
+                duration={duration}
+                isLoading={isLoading}
+                mainColor="#333"
+                onFullScreen={onFullScreen}
+                onPaused={onPaused}
+                onReplay={onReplay}
+                onSeek={onSeek}
+                onSeeking={onSeeking}
+                playerState={playerState}
+                progress={currentTime}
+                toolbar={renderToolbar()}
+              />
+            </View>
+          </View>
+        )
+      }
+    </View>
+  )
+}
+
 const LearnItem = () => {
   const route = useRoute();
   const [loading, setLoading] = useState(true);
   const [dataStudy, setDataStudy] = useState([]);
   const [learnItems, setLearnItems] = useState([]);
   const [imgBase64s, setImgBase64s] = useState([]);
-
+  const [isShowList, setIsShowList] = useState(true);
   useEffect(() => {
-    loadDataDetail(route.params.detail);
-    handleLoadImage();
+    // lấy dữ liệu
+    const _learnItems = loadDataDetail(route.params.detail);
+    console.log("_learnItems useEffect", _learnItems);
+    // // tạo file ảnh, audio trên thiết bị
+    // createFileInDevice(_learnItems);
   }, [])
 
-  const handleLoadImage = async () => {
+  const handleLoadImage = async (_learnItems) => {
     try {
-      const files = await fs.readDir(fs.DocumentDirectoryPath + `/images/${he.decode(route.params.labelParent)}/${he.decode(route.params.title)}`)
-      const promisesGetFile = files.map(file => new Promise((resolve, reject) => {
-        fs.readFile(file.path, "base64")
-          .then(_base64 => {
-            resolve({
-              "label": file.path.split("/").pop().split(".")[0],
-              "uri": `data:image/${file.path.split(".").pop()};base64,${_base64}`
+      let _imageBase64s = [];
+      var isExistDir = await fs.exists(fs.DocumentDirectoryPath + `/images/${he.decode(route.params.labelParent)}/${he.decode(route.params.title)}`);
+      if (isExistDir) {
+        const files = await fs.readDir(fs.DocumentDirectoryPath + `/images/${he.decode(route.params.labelParent)}/${he.decode(route.params.title)}`)
+        const promisesGetFile = files.map(file => new Promise((resolve, reject) => {
+          fs.readFile(file.path, "base64")
+            .then(_base64 => {
+              resolve({
+                "label": file.path.split("/").pop().split(".")[0],
+                "uri": `data:image/${file.path.split(".").pop()};base64,${_base64}`
+              })
             })
-          })
-      }));
-      const _imageBase64s = await Promise.all(promisesGetFile)
+        }));
+        _imageBase64s = await Promise.all(promisesGetFile)
+      } else {
+        const promisesUri = _learnItems.map(item => new Promise((resolve, reject) => {
+          getLinkFile(item.linkImg)
+            .then(tailBase64Img => {
+              resolve({
+                "label": item.label,
+                "uri": `data:image/${tailBase64Img.tail};base64,${tailBase64Img.base64}`
+              })
+            })
+        }))
+        _imageBase64s = await Promise.all(promisesUri);
+      }
       setImgBase64s(_imageBase64s);
     } catch (error) {
       console.log("Error loadImage", error);
@@ -113,14 +285,15 @@ const LearnItem = () => {
   const loadDataDetail = async (param) => {
     try {
       let data = await read(SHEMAS_NAME.WORDITEM);
-      data = data.filter((item) => item.path == `/${he.decode(route.params.labelParent)}/${he.decode(route.params.title)}`);
+      const dataPath = data.filter((item) => item.path == `/${he.decode(route.params.labelParent)}/${he.decode(route.params.title)}`);
       let _learnItems = [];
-      console.log("data read", data);
-      if (data && data.length > 0) {
-        console.log("has data");
+      if (dataPath && dataPath.length > 0) {
         setLoading(false);
-        _learnItems = [...data];
-        setLearnItems(data);
+        _learnItems = dataPath;
+        console.log("has dataPath");
+        setLearnItems(dataPath);
+        // load ảnh
+        handleLoadImage(_learnItems);
       } else {
         setLoading(true);
         console.log("no data");
@@ -145,10 +318,14 @@ const LearnItem = () => {
         })
 
         _learnItems = await _readLearnDetail(response.data.tree);
+        setLearnItems(_learnItems);
+        setLoading(false);
+        // load ảnh
+        handleLoadImage(_learnItems);
+        // tạo file ảnh, audio trên thiết bị
+        createFileInDevice(_learnItems);
       }
-      console.log("_learnItems", _learnItems);
-      // tạo file ảnh, audio trên thiết bị
-      createFileInDevice(_learnItems);
+      return _learnItems;
     } catch (error) {
       setLoading(false);
       console.log("error loadDataDetail", error);
@@ -173,37 +350,42 @@ const LearnItem = () => {
           return getDataFile(item.attributes["data-uri"])
         })
         setDataStudy(_dataStudy);
-        const learnItems = await Promise.all(promisesGetItemData);
-        const bulkCreateds = await bulkCreate(SHEMAS_NAME.WORDITEM, learnItems.map(item => ({
+        const _learnItems = await Promise.all(promisesGetItemData);
+        await bulkCreate(SHEMAS_NAME.WORDITEM, _learnItems.map(item => ({
           ...item,
           _id: uuidv4(),
           path: `/${he.decode(route.params.labelParent)}/${he.decode(route.params.title)}`
         })))
-        console.log("learnItems bulkCreateds", bulkCreateds);
-        return learnItems;
+        return _learnItems;
       }
     } catch (error) {
       console.log("Error read file", error);
     }
   }
 
-  const createFileInDevice = async (learnItems) => {
+  const createFileInDevice = async (_learnItems) => {
     try {
       // save file base64
-      for (var i = 0; i < learnItems.length; i++) {
-        const singleLinkFile = learnItems[i];
+      console.log("learnItems createFileInDevice", _learnItems);
+      console.log("createFileInDevice", learnItems);
+      for (var i = 0; i < _learnItems.length; i++) {
+        const singleLinkFile = _learnItems[i];
         // save file image
         const tailBase64Img = await getLinkFile(singleLinkFile.linkImg);
         await fs.mkdir(fs.DocumentDirectoryPath + `/images/${he.decode(route.params.labelParent)}/${he.decode(route.params.title)}`);
         await fs.writeFile(fs.DocumentDirectoryPath + `/images/${he.decode(route.params.labelParent)}/${he.decode(route.params.title)}/${singleLinkFile.label}.${tailBase64Img.tail}`, tailBase64Img.base64, "base64")
-        // save file audio
 
+        // save file audio
         const tailBase64Audio = await getLinkFile(singleLinkFile.linkAudio)
         await fs.mkdir(fs.DocumentDirectoryPath + `/audios/${he.decode(route.params.labelParent)}/${he.decode(route.params.title)}`);
         await fs.writeFile(fs.DocumentDirectoryPath + `/audios/${he.decode(route.params.labelParent)}/${he.decode(route.params.title)}/${singleLinkFile.label}.${tailBase64Audio.tail}`, tailBase64Audio.base64, "base64")
+
+        //save file video
+        const tailBase64Video = await getLinkFile(singleLinkFile.linkVideo)
+        console.log("save video");
+        await fs.mkdir(fs.DocumentDirectoryPath + `/videos/${he.decode(route.params.labelParent)}/${he.decode(route.params.title)}`);
+        await fs.writeFile(fs.DocumentDirectoryPath + `/videos/${he.decode(route.params.labelParent)}/${he.decode(route.params.title)}/${singleLinkFile.label}.${tailBase64Video.tail}`, tailBase64Video.base64, "base64")
       }
-      setLearnItems(learnItems);
-      setLoading(false);
     } catch (error) {
       console.log("Error createFileIndevice", error);
     }
@@ -215,23 +397,43 @@ const LearnItem = () => {
       const itemData = await getItemData(uri);
       if (itemData.itemData.body.elements) {
         const link = "http://aigle.blife.ai/taoQtiItem/QtiPreview/render/aHR0cDovL2FpZ2xlLmJsaWZlLmFpL0FpZ2xlLnJkZiNpMTYwNTM0NDgyNTcyNzk2NDk5/";
-        const [linkAudio, linkImg] = Object.values(itemData.itemData.body.elements)
-          .map(element => {
-            if (element.qtiClass == "mediaInteraction") {
-              return link + JSON.stringify(element.object.attributes.data).slice(1, -1);
-            } else if (element.qtiClass == "img") {
-              return link + JSON.stringify(element.attributes.src).slice(1, -1);
-            }
-          })
+        let linkAudio = "", linkVideo = "", linkImg = "";
+        const values = Object.values(itemData.itemData.body.elements);
+        if (values.length == 2) {
+          [linkAudio, linkImg] = Object.values(itemData.itemData.body.elements)
+            .map(element => {
+              if (element.qtiClass == "mediaInteraction") {
+                return link + JSON.stringify(element.object.attributes.data).slice(1, -1);
+              } else if (element.qtiClass == "img") {
+                return link + JSON.stringify(element.attributes.src).slice(1, -1);
+              }
+            })
+        } else if (values.length == 3) {
+          [linkAudio, linkVideo, linkImg] = Object.values(itemData.itemData.body.elements)
+            .map(element => {
+              if (element.qtiClass == "mediaInteraction") {
+                if (element.object.attributes.type.split("/")[0] == "audio") {
+                  return link + JSON.stringify(element.object.attributes.data).slice(1, -1);
+                } else if (element.object.attributes.type.split("/")[0] == "video") {
+                  return link + JSON.stringify(element.object.attributes.data).slice(1, -1);
+                }
+              } else if (element.qtiClass == "img") {
+                return link + JSON.stringify(element.attributes.src).slice(1, -1);
+              }
+            })
+        }
+
         return {
           "label": itemData.itemData.attributes.label,
           "linkAudio": linkAudio,
+          "linkVideo": linkVideo,
           "linkImg": linkImg
         }
       }
       return {
         "label": "",
         "linkAudio": "",
+        "linkVideo": "",
         "linkImg": ""
       }
     } catch (error) {
@@ -240,32 +442,72 @@ const LearnItem = () => {
 
   }
 
+  const changeShowView = (val) => {
+    setIsShowList(val);
+    if (val) {
+      console.log("learnItems changeShowView", learnItems);
+    }
+  }
+
   return (
     <View style={styles.wrapper}>
       {
         loading ? (
-          <View style={{ width: "100%", height: "100%", alignItems: "center", justifyContent: "center" }}>
+          <View style={{ width: "100%", height: "10%", alignItems: "center", justifyContent: "center", backgroundColor: "gray" }}>
             <Spinner />
           </View>
         ) : (
-            <ScrollView style={styles.scrollViewImg}>
-              <View style={styles.wrapImg}>
+            <View style={{ width: "100%", height: "100%" }}>
+              <View style={{ width: "100%", height: 40, display: "flex", justifyContent: "center", alignItems: "flex-end", marginRight: 10 }}>
                 {
-                  imgBase64s
-                    .filter(img => img !== "")
-                    .map((item, index) => (
-                      <Card
-                        key={index}
-                        uri={item["uri"]}
-                        label={item["label"]}
-                        width={150}
-                        height={150}
-                        pathDir={fs.DocumentDirectoryPath + `/audios/${he.decode(route.params.labelParent)}/${he.decode(route.params.title)}`}
-                        pathFile={fs.DocumentDirectoryPath + `/audios/${he.decode(route.params.labelParent)}/${he.decode(route.params.title)}/${item["label"]}`} />
-                    ))
+                  isShowList ? (
+                    <Icon
+                      style={{ width: 32, height: 32 }}
+                      fill='#8F9BB3'
+                      name='square-outline'
+                      onPress={() => changeShowView(false)}
+                    />
+                  ) : (
+                      <Icon
+                        style={{ width: 32, height: 32 }}
+                        fill='#8F9BB3'
+                        name='grid-outline'
+                        onPress={() => changeShowView(true)}
+                      />
+                    )
                 }
               </View>
-            </ScrollView>
+              {
+                isShowList ? (
+                  <ScrollView style={styles.scrollViewImg}>
+                    <View style={styles.wrapImg}>
+                      {
+                        imgBase64s
+                          .filter(img => img !== "")
+                          .map((item, index) => (
+                            <Card
+                              key={index}
+                              uri={item["uri"]}
+                              label={item["label"]}
+                              width={150}
+                              height={150}
+                              pathDir={fs.DocumentDirectoryPath + `/audios/${he.decode(route.params.labelParent)}/${he.decode(route.params.title)}`}
+                              pathFile={fs.DocumentDirectoryPath + `/audios/${he.decode(route.params.labelParent)}/${he.decode(route.params.title)}/${item["label"]}`} />
+                          ))
+                      }
+                    </View>
+                  </ScrollView>
+                ) : (
+                    <ObjectStudy
+                      _learnItems={learnItems}
+                      labelParent={route.params.labelParent}
+                      title={route.params.title}
+                    >
+                    </ObjectStudy>
+                  )
+              }
+
+            </View>
           )
       }
     </View>

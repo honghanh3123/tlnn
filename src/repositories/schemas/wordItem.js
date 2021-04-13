@@ -6,6 +6,7 @@ export default {
     _id: "string",
     label: "string",
     linkAudio: "string",
+    linkVideo: "string",
     linkImg: "string",
     path: "string"
   },

@@ -66,34 +66,6 @@ export default () => {
     navigation.navigate(STARTTEST)
   }
 
-  const loadResult = async () => {
-    setResult({
-      ...result,
-      loading: true
-    })
-    const result = await dataResult();
-    // console.log("result", result);
-    // console.log("result attributes", result.attributes);
-    // console.log("result children", result.children);
-    setResult({
-      attributes: result.attributes,
-      children: result.children,
-      loading: false
-    })
-  }
-
-  const _onPressResult = () => {
-    setMode("RESULT");
-    loadResult();
-  }
-
-  const _handleViewResult = (item) => {
-    console.log("item", item);
-    navigation.navigate(RESULTS, {
-      name: item
-    })
-  }
-
   return (
     <View style={styles.wrapper}>
       <Text style={styles.wrapperTitle}>
@@ -113,13 +85,6 @@ export default () => {
           status={mode === "DONE" ? "warning" : "basic"}
         >
           Đã làm
-        </Button>
-        <Button
-          onPress={_onPressResult}
-          appearance={mode == "RESULT" ? "filled" : 'outline'} 
-          status={mode === "RESULT" ? "warning" : "basic"}
-          >
-          Kết quả
         </Button>
       </View>
       <View style={styles.wrapperTest}>
@@ -150,8 +115,8 @@ export default () => {
             </View>
           }}
         />
-        ) : (mode == "DOING") ? (
-            <FlatList
+        ) : (
+          <FlatList
               keyExtractor={item => item.nameTest}
               data={availabelExam.dataSource}
               refreshControl={(
@@ -178,33 +143,7 @@ export default () => {
                 </View>
               }}
             />
-          ) : (
-            <FlatList
-              keyExtractor={item => item.attributes.id}
-              data={result.children}
-              refreshControl={(
-                <RefreshControl 
-                  colors={["#0082ff"]}
-                  refreshing={result.loading}
-                />
-              )}
-              renderItem={({ item }) => {
-                return <View>
-                  <View style={styles.testItem}>
-                    <View style={styles.testBorderLeftBlue}></View>
-                    <View style={styles.testContent}>
-                      <Text style={styles.testTitleBlue}>{item.data}</Text>
-                      <View style={{width: "100%", display: "flex", alignItems: "flex-end"}}>
-                      <Button style={styles.btnFooter} onPress={() => _handleViewResult(item)}>
-                        Xem kết quả 
-                      </Button>
-                      </View>
-                    </View>
-                  </View>
-                </View>
-              }}
-            />
-          )}
+        )}
       </View>
     </View>
   )

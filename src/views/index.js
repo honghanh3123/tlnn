@@ -61,6 +61,16 @@ const LearnStackNavigation = () => (
   </Stack.Navigator>
 )
 
+const ResultStackNavigation = () => (
+  <Stack.Navigator>
+    <Stack.Screen name={WORDS} component={Words} options={{
+      header: BlankHeader
+    }} />
+    <Stack.Screen name={RESULTS} component={Results} />
+    <Stack.Screen name={RESULTDETAIL} component={ResultDetail} />
+  </Stack.Navigator>
+)
+
 const ScreenBottomTab = [
   {
     name: TESTS,
@@ -73,8 +83,8 @@ const ScreenBottomTab = [
     icon: LearnIcon
   },
   {
-    name: WORDS,
-    component: Words,
+    name: RESULTS,
+    component: ResultStackNavigation,
     icon: WordIcon
   },
   {

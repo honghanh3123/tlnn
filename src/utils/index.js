@@ -39,6 +39,8 @@ export const getFileTail = (contentType) => {
       return "mp3"
     case /image/g.test(contentType):
       return contentType.split("/").pop()
+    case contentType === "video/mp4":
+      return "mp4"
     default:
       break;
   }
