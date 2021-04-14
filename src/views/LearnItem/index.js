@@ -17,9 +17,8 @@ import { create, read, deleteRealm, deleteById, update, bulkCreate } from "repos
 import { SHEMAS_NAME } from "consts/schema";
 import { reject } from 'lodash';
 import Video from 'react-native-video';
-import
-MediaControls, { PLAYER_STATES }
-  from 'react-native-media-controls';
+import VideoPlayer from 'react-native-video-controls';
+
 const Card = ({
   uri, label, width, height, pathDir, pathFile
 }) => {
@@ -43,7 +42,6 @@ const Card = ({
       });
 
       playSound(file.path);
-      //return `data:image/${file.path.split(".").pop()};base64,${file}`;
     } catch (error) {
       console.log("Error loadAudio", error);
     }
@@ -87,84 +85,38 @@ const ObjectStudy = ({
 }) => {
 
   const [dataObject, setDataObject] = useState([]);
-  const ref = useRef();
+  const _videoRef = useRef();
   const [index, setIndex] = useState(0);
   useEffect(() => {
     handleLoadVideo();
   }, [])
 
-  const videoPlayer = useRef(null);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [isFullScreen, setIsFullScreen] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [paused, setPaused] = useState(false);
-  const [
-    playerState, setPlayerState
-  ] = useState(PLAYER_STATES.PLAYING);
-  const [screenType, setScreenType] = useState('content');
-
-  const onSeek = (seek) => {
-    //Handler for change in seekbar
-    videoPlayer.current.seek(seek);
-  };
-
-  const onPaused = (playerState) => {
-    //Handler for Video Pause
-    setPaused(!paused);
-    setPlayerState(playerState);
-  };
-
-  const onReplay = () => {
-    //Handler for Replay
-    setPlayerState(PLAYER_STATES.PLAYING);
-    videoPlayer.current.seek(0);
-  };
-
-  const onProgress = (data) => {
-    // Video Player will progress continue even if it ends
-    if (!isLoading && playerState !== PLAYER_STATES.ENDED) {
-      setCurrentTime(data.currentTime);
-    }
-  };
-
-  const onLoad = (data) => {
-    setDuration(data.duration);
-    setIsLoading(false);
-  };
-
-  const onLoadStart = (data) => setIsLoading(true);
-
-  const onEnd = () => setPlayerState(PLAYER_STATES.ENDED);
-
-  const onError = () => alert('Oh! ', error);
-
-  const exitFullScreen = () => {
-    alert('Exit full screen');
-  };
-
-  const enterFullScreen = () => { };
-
-  const onFullScreen = () => {
-    setIsFullScreen(isFullScreen);
-    if (screenType == 'content') setScreenType('cover');
-    else setScreenType('content');
-  };
-
-  const renderToolbar = () => (
-    <View>
-      <Text style={styles.toolbar}> toolbar </Text>
-    </View>
-  );
-
-  const onSeeking = (currentTime) => setCurrentTime(currentTime);
-
   const handleLoadVideo = async () => {
     let data = _learnItems.filter(item => item.linkVideo != "");
     console.log("data", data);
     const result = await Promise.all(data.map(async item => {
-      const pathDir = fs.DocumentDirectoryPath + `/videos/${he.decode(labelParent)}/${he.decode(title)}`;
-      const pathFile = fs.DocumentDirectoryPath + `/videos/${he.decode(labelParent)}/${he.decode(title)}/${item.label}`;
+      const pathDirVideo = fs.DocumentDirectoryPath + `/videos/${he.decode(labelParent)}/${he.decode(title)}`;
+      const pathDirAudio = fs.DocumentDirectoryPath + `/audios/${he.decode(labelParent)}/${he.decode(title)}`;
+      const pathDirImg = fs.DocumentDirectoryPath + `/images/${he.decode(labelParent)}/${he.decode(title)}`;
+      const tmpVideo = fs.DocumentDirectoryPath + `/videos/${he.decode(labelParent)}/${he.decode(title)}/${item.label}`;
+      const tmpAudio = fs.DocumentDirectoryPath + `/audios/${he.decode(labelParent)}/${he.decode(title)}/${item.label}`;
+      const tmpImg = fs.DocumentDirectoryPath + `/images/${he.decode(labelParent)}/${he.decode(title)}/${item.label}`;
+      const [uriVideo, uriAudio, uriImg] = await Promise.all([
+        getFilePath(pathDirVideo, tmpVideo),
+        getFilePath(pathDirAudio, tmpAudio),
+        getFilePath(pathDirImg, tmpImg)
+      ])
+      item.uriVideo = uriVideo;
+      item.uriAudio = uriAudio;
+      const _base64Img = await fs.readFile(uriImg, "base64");
+      item.uriImg = `data:image/${uriImg.split(".").pop()};base64,${_base64Img}`;
+      return item;
+    }));
+    setDataObject(result);
+  }
+
+  const getFilePath = async (pathDir, pathFileFirst) => {
+    try {
       const isExistFile = await fs.exists(pathDir);
       if (isExistFile) {
         console.log("isExistFile");
@@ -172,57 +124,90 @@ const ObjectStudy = ({
         const file = files.find(file => {
           var firstLink = file.path.split(".");
           firstLink.pop();
-          return firstLink.join(".") === pathFile;
+          return firstLink.join(".") === pathFileFirst;
         });
-        item.uri = file.path;
-        return item;
+        return file.path;
       }
-    }));
-    console.log("promiseData", result);
-    setDataObject(result);
+      return "";
+    } catch (error) {
+      console.log("Error geFilePath", error);
+    }
+  }
+
+  const playSound = (path) => {
+    Sound.setCategory('Playback');
+    const sound = new Sound(path, '', () => sound.play())
+  }
+
+  const reduceIndex = (index) => {
+    console.log("index", index);
+    console.log("index == 0", index == 0);
+    if(index == 0) {
+      return;
+    }else{
+      console.log("index reduceIndex", index - 1);
+      setIndex(index - 1);
+    }
+  }
+
+  const increaseIndex = (index) => {
+    console.log("index", index);
+    console.log("dataObject.length", dataObject.length);
+    if(index == dataObject.length - 1) {
+      return;
+    }else {
+      console.log("index increaseIndex", index + 1);
+      setIndex(index + 1);
+    }
   }
 
   return (
     <View style={styles.wrapper}>
       {
         dataObject && dataObject.length > 0 && (
-          <View style={{ flex: 1 }}>
-            <Text>{dataObject[0].label}</Text>
-            {/* <View style={{flex: 1}}>
-              <Video
-                source={{ uri: dataObject[0].uri }}   // Can be a URL or a local file.
-                ref={ref}
-                style={styles.backgroundVideo}>
-              </Video>
-            </View> */}
-            <View style={{ flex: 1 }}>
-              <Video
-                onEnd={onEnd}
-                onLoad={onLoad}
-                onLoadStart={onLoadStart}
-                onProgress={onProgress}
-                paused={paused}
-                ref={videoPlayer}
-                resizeMode={screenType}
-                onFullScreen={isFullScreen}
+          <View style={{ height: "100%", width: "100%", backgroundColor: "gray" }}>
+            <View style={{ width: "100%", alignItems: "center", backgroundColor: "red" }}>
+              <Text style={{ fontSize: 20, fontWeight: "bold", color: "#0072bc" }}>{dataObject[0].label}</Text>
+            </View>
+            <View style={{ height: 200 }}>
+              <VideoPlayer
                 source={{
-                  uri: dataObject[0].uri
+                  uri: dataObject[index].uriVideo
                 }}
-                style={styles.mediaPlayer}
-                volume={10}
+                style={{
+                  height: 200
+                }}
+                videoStyle={{
+                  height: 200
+                }}
               />
-              <MediaControls
-                duration={duration}
-                isLoading={isLoading}
-                mainColor="#333"
-                onFullScreen={onFullScreen}
-                onPaused={onPaused}
-                onReplay={onReplay}
-                onSeek={onSeek}
-                onSeeking={onSeeking}
-                playerState={playerState}
-                progress={currentTime}
-                toolbar={renderToolbar()}
+            </View>
+            <View style={{ width: "100%", alignItems: "center", backgroundColor: "green" }}>
+              <Image
+                style={{ height: 200, width: 200 }}
+                source={{
+                  uri: dataObject[index].uriImg
+                }}
+              />
+            </View>
+            <View style={{ display: "flex", flexDirection: "row", justifyContent: "space-around", width: "100%", backgroundColor: "#d0d0d0" }}>
+              <Icon
+                style={{ width: 32, height: 32 }}
+                fill='#0072bc'
+                name='arrow-ios-back-outline'
+                onPress={() => {reduceIndex(index)}}
+              />
+              <Icon
+                style={{ width: 32, height: 32 }}
+                fill='#0072bc'
+                name='volume-up-outline'
+                onPress={() => {playSound(dataObject[index].uriAudio)}}
+              />
+              <Icon
+                style={{ width: 32, height: 32 }}
+                fill='#0072bc'
+                name='arrow-ios-forward-outline'
+                onPress={() => {increaseIndex(index)}}
               />
             </View>
           </View>
