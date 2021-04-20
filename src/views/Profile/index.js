@@ -46,13 +46,6 @@ export default () => {
 
   return (
     <View style={styles.wrapper}>
-      <Text style={styles.wrapperTitle}>
-        Bài kiểm tra
-      </Text>
-      <View style={styles.inlineButton}>
-        <Button style={styles.btnNotDo} onPress={handle}>Chưa làm</Button>
-        <Button style={styles.btnDone}>Đã làm</Button>
-      </View>
       <View>
         <Button onPress={_logout}>
           Logout

@@ -18,12 +18,9 @@ export const apiQuestion = async (apiQuestion) => {
 export const apiInitTest = async ({
   testDefinition,
   testCompilation,
-  serviceCallId,
-  itemDefinition
+  serviceCallId
 }) => {
   try {
-    const data = new FormData();
-    data.append()
     const cookie = await AsyncStorage.getItem("@cookie");
     const endPoint = "http://aigle.blife.ai/taoQtiTest/Runner/init";
     const response1 = await Axios.get(endPoint, {
@@ -33,27 +30,17 @@ export const apiInitTest = async ({
       params: {
         testDefinition: testDefinition,
         testCompilation: testCompilation,
-        testServiceCallId: serviceCallId,
-        itemDefinition: itemDefinition
+        testServiceCallId: serviceCallId
       }
     })
-    if(response1.data && response1.data.token){
-      const token = response1.data.token;
-      // const _response = await apiQuestionTest({
-      //   token,
-      //   testDefinition,
-      //   testCompilation,
-      //   serviceCallId,
-      //   itemDefinition
-      // });
-      return {
-        token,
-        testDefinition,
-        testCompilation,
-        serviceCallId,
-        itemDefinition
-      }
+    
+    const paramTest = {
+      token: response1.data.token,
+      itemIdentifier: response1.data.testContext.itemIdentifier,
+      totalQuestion: response1.data.testMap.stats.total | 0
     }
+
+    return paramTest;
   } catch (error) {
     return error.response
   }
@@ -75,12 +62,17 @@ export const apiQuestionTest = async ({
   itemDefinition
 }) => {
   try {
+    console.log("getItem testDefinition", testDefinition);
+    console.log("getItem testCompilation", testCompilation);
+    console.log("getItem serviceCallId", serviceCallId);
+    console.log("getItem itemDefinition", itemDefinition);
+    console.log("token", token);
     const endPoint = "http://aigle.blife.ai/taoQtiTest/Runner/getItem";
     const cookie = await AsyncStorage.getItem("@cookie");
     const response2 = await Axios.get(endPoint, {
       headers: {
         Cookie: cookie,
-        'x-auth-token': token
+        'X-Auth-Token': token
       },
       params: {
         testDefinition: testDefinition,

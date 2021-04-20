@@ -13,17 +13,17 @@ export default () => {
     isLogin: false
   });
 
-  const [isSynchronizing, setIsSynchronizing] = useState (false);
+  const [isSynchronizing, setIsSynchronizing] = useState(false);
 
   useEffect(() => {
-    handleSaveDataToRealm();
+    //handleSaveDataToRealm();
   }, [])
 
-  handleSaveDataToRealm = () => {
+  handleSaveDataToRealm = async () => {
     const latestUpdateTime = await AsyncStorage.setItem("LatestUpdateTime");
-    if(!latestUpdateTime || Date.now() - latestUpdateTime >= 24*60*60) {
+    if (!latestUpdateTime || Date.now() - latestUpdateTime >= 24 * 60 * 60) {
       setIsSynchronizing(true);
-      
+      await AsyncStorage.setItem("LatestUpdateTime", Date.now());
     }
   }
 
@@ -42,16 +42,7 @@ export default () => {
     >
       <IconRegistry icons={EvaIconsPack} />
       <ApplicationProvider {...eva} theme={eva.light}>
-        {
-          isSynchronizing ? (
-            <View>
-              <Text>Hệ thống đang thực hiện đồng bộ dữ liệu.</Text>
-              <Text>Vui lòng chờ trong ít phút.</Text>
-            </View>
-          ) : (
-            <Views />
-          )
-        }
+        <Views />
       </ApplicationProvider>
     </RootContext.Provider>
   );

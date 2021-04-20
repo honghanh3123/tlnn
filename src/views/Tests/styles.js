@@ -1,20 +1,18 @@
-import { StyleSheet } from "react-native";
-import { block, greaterThan } from "react-native-reanimated";
-import { Autocomplete } from "@ui-kitten/components";
-
+import { StyleSheet, Dimensions } from "react-native";
+const screenWidth = Dimensions.get("screen").width
+const screenHeight = Dimensions.get("screen").height
 export default StyleSheet.create({
   wrapper: {
     display: "flex",
     alignItems: "center",
-    justifyContent: "center",
-    flex: 1
+    width: "100%",
+    height: "100%"
   },
 
-
   wrapperTitle: {
-    marginTop: 30,
+    marginTop: 20,
     marginBottom: 20,
-    fontSize: 28,
+    fontSize: 22,
     fontWeight: "bold"
   },
 
@@ -44,9 +42,11 @@ export default StyleSheet.create({
   },
 
   wrapperTest: {
-    marginTop: 50,
+    marginTop: 20,
     width: "100%",
-    flex: 1
+    height: "100%",
+    backgroundColor: "#fff"
+    //flex: 1
   },
 
   testItem: {
@@ -57,52 +57,20 @@ export default StyleSheet.create({
     marginHorizontal: 24,
     display: "flex",
     flexDirection: "row",
-    // minHeight: 100,
     marginBottom: 12,
     position: "relative",
     padding: 15
   },
 
-  testBorderLeftGreen: {
-    // minHeight: 116,
+  testBorderLeft: {
     width: 8,
-    backgroundColor: "#45BA0E",
     marginTop: 2,
     borderRadius: 5
   },
 
-  testTitleGreen: {
+  testTitle: {
     fontSize: 20,
-    fontWeight: "bold",
-    color: "#45BA0E"
-  },
-
-  testBorderLeftBlue: {
-    // minHeight: 146,
-    width: 8,
-    backgroundColor: "#0E47BA",
-    marginTop: 2,
-    borderRadius: 5
-  },
-
-  testTitleBlue: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#0E47BA"
-  },
-
-  testBorderLeftRed: {
-    // minHeight: 146,
-    width: 8,
-    backgroundColor: "#FF5811",
-    marginTop: 2,
-    borderRadius: 5
-  },
-
-  testTitleRed: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#FF5811"
+    fontWeight: "bold"
   },
 
   testContent: {
@@ -111,23 +79,22 @@ export default StyleSheet.create({
     width: "90%"
   },
 
-  testTime: {
-    // marginTop: 8,
-    // marginBottom: 8
-  },
-
-  createTime: {
-    // marginTop: 12,
-    // left: 100,
-    // color: "#838FA6"
-  },
-
   btnFooter: {
     height: 30,
-    // width: 100,
     marginBottom: 10,
     textAlign: "right"
-    // top: 10,
-    // left: 200
+  },
+
+  textGroup: {
+    display: "flex", 
+    justifyContent: "space-evenly", 
+    alignItems: "center", 
+    flexDirection: "row",
+    marginBottom: 4
+  },
+
+  layout: {
+    width: "100%",
+    height: 0.8*screenHeight - 60
   }
 })

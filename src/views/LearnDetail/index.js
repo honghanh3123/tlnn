@@ -11,9 +11,7 @@ import { SafeAreaView,
   Platform, } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Axios from 'axios';
-import { DOMParser } from 'react-native-html-parser';
 import { LEARNDETAIL, LEARNITEM } from 'consts/screens';
-import { FlexStyleProps } from '@ui-kitten/components/devsupport';
 import he from "he"
 import { Button, Avatar, Spinner } from '@ui-kitten/components';
 import styles from './styles';

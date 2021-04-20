@@ -1,16 +1,19 @@
 import React, { Fragment, useState, useEffect } from 'react';
 import { Button, Avatar, Spinner } from '@ui-kitten/components';
 import { View, Text, StyleSheet, TouchableNativeFeedback } from 'react-native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import styles from './styles';
 import { getQuestions } from 'service/question';
-import Cat from 'views/TemplateQuestion/Order';
 import Choice from 'views/TemplateQuestion/Choice';
 import Order from "views/TemplateQuestion/Order";
 import Associate from "views/TemplateQuestion/Associate";
 import Math from "views/TemplateQuestion/Match";
 import Test from 'datafix/Test';
-import { apiQuestionTest } from "apis/questionTest";
+import { apiQuestionTest, apiInitTest } from "apis/questionTest";
+import { TESTS } from 'consts/screens';
+import dataparam from 'service/hooks/dataparam';
 export default () => {
+  const navigation = useNavigation();
   const [dataQuestion, setDataQuestion] = useState({
     baseUrl: "",
     token: "",
@@ -19,22 +22,43 @@ export default () => {
     answers: "",
     suggestQuestion: ""
   })
+  const route = useRoute();
   const [_qtiClass, setQtiClass] = useState({});
   const [loading, setLoading] = useState(true);
-  const [questionIndex, setQuestionIndex] = useState(4);
+  const [questionIndex, setQuestionIndex] = useState(1);
+  const [totalQuestion, setTotalQuestion] = useState(0);
   useEffect(() => {
-    getQuestion();
-  }, [questionIndex])
+    getQuestion("", "");
+  }, [])
 
   // lấy dữ liệu câu hỏi
-  const getQuestion = async () => {
+  const getQuestion = async (itemIdentifier, token) => {
     try {
       setLoading(true);
-      let paramTest = await getQuestions(`item-${questionIndex}`);
+      const dataParam = await dataparam(false, route.params.apiQuestion);
+      console.log("itemIdentifier", itemIdentifier, "token", token);
+      console.log(!itemIdentifier && !token);
+      if(!itemIdentifier && !token){
+        console.log("call APIHJKHKKKKK");
+        const paramTest = await apiInitTest({
+          testDefinition: dataParam.testDefinition,
+          testCompilation: dataParam.testCompilation,
+          serviceCallId: dataParam.serviceCallId
+        });
+        setTotalQuestion(paramTest.totalQuestion);
+        itemIdentifier = paramTest.itemIdentifier;
+        token = paramTest.token;
+      }
+      
       const response = await apiQuestionTest({
-        ...paramTest
+        token: token,
+        testCompilation: dataParam.testCompilation,
+        testDefinition: dataParam.testDefinition,
+        serviceCallId: dataParam.serviceCallId,
+        itemDefinition: itemIdentifier
       });
-      _readQuestion(response.data);
+
+      _readQuestion(response.data, dataParam);
       setLoading(false)
     } catch (error) {
       setLoading(false)
@@ -43,15 +67,16 @@ export default () => {
   }
 
   // đọc câu hỏi
-  const _readQuestion = (data) => {
+  const _readQuestion = (data, dataParam) => {
     try {
-      
+      console.log("data", data);
       dataQuestion.baseUrl = data['baseUrl'];
       dataQuestion.token = data['token'];
       let elements = data.itemData.data.body.elements;
       let qtiClass = Object.values(elements)[0].qtiClass;
+      setQtiClass(qtiClass)
       let question = Object.values(elements)[0].prompt.body;
-      let suggestQuestion = Object.values(elements)[0].body.body;
+      
       let choices = Object.values(elements)[0].choices;
       let objChoises = Object.values(choices);
       let answers = [];
@@ -62,27 +87,37 @@ export default () => {
         answer.qtiClass = item.qtiClass;
         answers.push(answer);
       });
-      // dataQuestion.question = question;
-      // dataQuestion.answers = answers;
+      let suggestQuestion = "";
+      if(Object.values(elements)[0] && Object.values(elements)[0].body && Object.values(elements)[0].body.body) {
+        suggestQuestion = Object.values(elements)[0].body.body;
+      }
+
       setDataQuestion({
+        apiQuestion: route.params.apiQuestion,
+        itemIdentifier: data.itemIdentifier,
         baseUrl: data['baseUrl'],
         token: data['token'],
         typeQuestion: "",
         question: question,
         answers: answers,
-        suggestQuestion: suggestQuestion ? suggestQuestion : ""
+        paramTest: dataParam,
+        suggestQuestion: suggestQuestion
       });
-      setQtiClass(qtiClass)
+      
     } catch (error) {
       return error;
     }
   }
 
   // next question
-  const handleNextQuestion = () => {
+  const handleNextQuestion = (itemIdentifier, token) => {
     setQuestionIndex(questionIndex + 1);
+    getQuestion(itemIdentifier, token);
   }
 
+  const hanleEndTest = () => {
+    navigation.navigate(TESTS);
+  }
   return (
     <View style={styles.wrapper}>
       <Text style={styles.wrapperTitle}>
@@ -99,22 +134,30 @@ export default () => {
             ? <Choice dataQuestion={dataQuestion} 
               onNextQuestion={handleNextQuestion}
               loading={loading}
-              questionIndex={questionIndex}/>
+              questionIndex={questionIndex}
+              totalQuestion={totalQuestion}
+              hanleEndTest={hanleEndTest}/>
             : _qtiClass == "orderInteraction" 
             ? <Order dataQuestion={dataQuestion} 
               onNextQuestion={handleNextQuestion}
               loading={loading}
               questionIndex={questionIndex}
+              totalQuestion={totalQuestion}
+              hanleEndTest={hanleEndTest}
               />
             : _qtiClass == "gapMatchInteraction"
             ? <Associate dataQuestion={dataQuestion} 
               onNextQuestion={handleNextQuestion}
               loading={loading}
-              questionIndex={questionIndex}/>
+              questionIndex={questionIndex}
+              totalQuestion={totalQuestion}
+              hanleEndTest={hanleEndTest}/>
             : <Math dataQuestion={dataQuestion} 
               onNextQuestion={handleNextQuestion}
               loading={loading}
-              questionIndex={questionIndex}/>
+              questionIndex={questionIndex}
+              totalQuestion={totalQuestion}
+              hanleEndTest={hanleEndTest}/>
             )
         }
       </View>

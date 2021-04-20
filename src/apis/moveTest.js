@@ -13,13 +13,20 @@ export const apiMoveTest = async (token, dataParam, {
 }) => {
   try {
     const data = new FormData();
+
+    console.log("itemResponse", itemResponse);
+    console.log("itemState", itemState);
+    console.log("itemDuration", itemDuration);
+
     data.append("itemResponse", itemResponse)
     data.append("itemState", itemState)
     data.append("direction", "next");
     data.append("scope", "item");
-    data.append("itemDuration", " 5.007355000008829");
+    data.append("itemDuration", itemDuration);
     const cookie =await AsyncStorage.getItem("@cookie");
     const endPoint = "http://aigle.blife.ai/taoQtiTest/Runner/move";
+    console.log("cookie", cookie);
+    console.log("token", token);
     const response = await Axios.post(endPoint, data, {
       headers: {
         "X-Requested-With": "XMLHttpRequest",
@@ -28,16 +35,18 @@ export const apiMoveTest = async (token, dataParam, {
         "Content-Type": "multipart/form-data"
       },
       params: {
-        testDefinition: "http://aigle.blife.ai/Aigle.rdf#i161184469672077879",
-        testCompilation: "http://aigle.blife.ai/Aigle.rdf#i161184484581707882-|http://aigle.blife.ai/Aigle.rdf#i161184484519257883+",
-        testServiceCallId: "http://aigle.blife.ai/Aigle.rdf#i161605233954628514",
-        itemDefinition: "item-1"
+        testDefinition: dataParam.testDefinition, 
+        testCompilation: dataParam.testCompilation, 
+        testServiceCallId: dataParam.serviceCallId,
+        itemDefinition: dataParam.itemDefinition, 
       }
     })
 
-    console.log("\n\n\n\n\n\n\n\n\n\napiMoveTest", response.data);
+    console.log("\n\n\n\n\n\n\n\n\n\napiMoveTest", response, dataParam.itemDefinition);
+    console.log("\n\n\n itemDefinition", response.data.testContext.itemIdentifier);
+    return response.data;
   } catch (error) {
-    console.log("\n\n\n\n\n\n\n\nErrororor:", error.response.data)
+    console.log("\n\n\n\n\n\n\n\nErrororor:", error)
     return error.response
   }
 }

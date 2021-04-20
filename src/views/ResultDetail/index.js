@@ -24,7 +24,7 @@ export default () => {
     console.log("id", param.detail.id);
     data.append("classUri", param.classUri);
     data.append("id", param.detail.id);
-    const cookie =await AsyncStorage.getItem("@cookie");
+    const cookie = await AsyncStorage.getItem("@cookie");
     const endPoint = "http://aigle.blife.ai/taoOutcomeUi/Results/viewResult";
     const response = await Axios.post(endPoint, data, {
       headers: {
@@ -34,47 +34,54 @@ export default () => {
       }
     })
 
-    // console.log("loadDetailResult", response);
     _readResult(response.data);
   }
 
   const _readResult = (data) => {
-    console.log("_readResult", data);
-    const parser = new DOMParser();
-    const result = parser.parseFromString(data, "text/html");
-    console.log("result", result);
-    var results = [], totalPoint = 0;
-    const questions = result.getElementsByClassName('matrix');
-    console.log("questions", questions);
-    for (var i = 0; i < questions.length; i++) {
-      const tbody = questions[i].getElementsByTagName('tbody')[0];
-      let point = tbody
-      .getElementsByTagName('tr')[6]
-      .getElementsByClassName('dataResult')[0]
-      .firstChild.data;
-      point = Number(point);
+    try {
+      if (data.includes("div")) {
+        const parser = new DOMParser();
+        const result = parser.parseFromString(data, "text/html");
+        var results = [], totalScore = 0, totalMaxScore = 0;
+        const questions = result.getElementsByClassName('matrix');
+        for (var i = 0; i < questions.length; i++) {
+          const tbody = questions[i].getElementsByTagName('tbody')[0];
+          if (tbody.getElementsByTagName('tr')[6] && tbody.getElementsByTagName('tr')[3]) {
+            let score = tbody
+              .getElementsByTagName('tr')[6]
+              .getElementsByClassName('dataResult')[0]
+              .firstChild.data;
+              score = Number(score);
 
-      let response = tbody
-      .getElementsByTagName('tr')[3]
-      .getElementsByClassName('dataResult')[0]
-      .firstChild.data;
-      response = response.trim();
-      
-      results.push({
-        "response": response,
-        "point": point
-      });
-      totalPoint += point;
+            let maxScore = tbody
+            .getElementsByTagName('tr')[7]
+            .getElementsByClassName('dataResult')[0]
+            .firstChild.data;
+
+            maxScore = Number(maxScore);
+            console.log("maxScore", maxScore);
+            let response = tbody
+              .getElementsByTagName('tr')[3]
+              .getElementsByClassName('dataResult')[0]
+              .firstChild.data;
+
+            response = response.trim();
+
+            results.push({
+              "response": response,
+              "score": score,
+              "maxScore": maxScore
+            });
+            totalScore += score;
+            totalMaxScore += maxScore;
+          }
+        }
+
+        console.log("results", results);
+      }
+    } catch (error) {
+      console.log("Lỗi đọc html _readResult", error);
     }
-
-    console.log("results", results);
-    // console.log("totalPoint", totalPoint);
-    // const body = response.body;
-    // console.log("data", response.data);
-    // if (body == '' && response.headers.length == 12)
-    //   return console.log("Phiên đăng nhập của bạn đã hết!");
-    // else if (body == '') return console.log("Kết nối mạng không ổn định.");
-    // return body;
   }
 
   return (

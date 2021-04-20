@@ -15,7 +15,7 @@ import CardFlip from 'react-native-card-flip';
 import Sound from 'react-native-sound';
 import { create, read, deleteRealm, deleteById, update, bulkCreate } from "repositories";
 import { SHEMAS_NAME } from "consts/schema";
-import { reject } from 'lodash';
+import { reject, set } from 'lodash';
 import Video from 'react-native-video';
 import VideoPlayer from 'react-native-video-controls';
 
@@ -48,8 +48,27 @@ const Card = ({
   }
 
   const playSound = (path) => {
-    Sound.setCategory('Playback');
-    const sound = new Sound(path, '', () => sound.play())
+    const sound = new Sound(path, '', () => {
+      sound.play();
+    })
+
+    // var whoosh = new Sound(path, Sound.MAIN_BUNDLE, (error) => {
+    //   if (error) {
+    //     console.log('failed to load the sound', error);
+    //     return;
+    //   }
+    //   // loaded successfully
+    //   console.log('duration in seconds: ' + whoosh.getDuration() + 'number of channels: ' + whoosh.getNumberOfChannels());
+    
+    //   // Play the sound with an onEnd callback
+    //   whoosh.play((success) => {
+    //     if (success) {
+    //       console.log('successfully finished playing');
+    //     } else {
+    //       console.log('playback failed due to audio decoding errors');
+    //     }
+    //   });
+    // });
   }
 
   return (
@@ -93,7 +112,6 @@ const ObjectStudy = ({
 
   const handleLoadVideo = async () => {
     let data = _learnItems.filter(item => item.linkVideo != "");
-    console.log("data", data);
     const result = await Promise.all(data.map(async item => {
       const pathDirVideo = fs.DocumentDirectoryPath + `/videos/${he.decode(labelParent)}/${he.decode(title)}`;
       const pathDirAudio = fs.DocumentDirectoryPath + `/audios/${he.decode(labelParent)}/${he.decode(title)}`;
@@ -117,6 +135,7 @@ const ObjectStudy = ({
 
   const getFilePath = async (pathDir, pathFileFirst) => {
     try {
+      console.log();
       const isExistFile = await fs.exists(pathDir);
       if (isExistFile) {
         console.log("isExistFile");
@@ -130,33 +149,28 @@ const ObjectStudy = ({
       }
       return "";
     } catch (error) {
+      let data = await read(SHEMAS_NAME.WORDITEM);
+      await deleteRealm(data);
       console.log("Error geFilePath", error);
     }
   }
 
   const playSound = (path) => {
-    Sound.setCategory('Playback');
     const sound = new Sound(path, '', () => sound.play())
   }
 
   const reduceIndex = (index) => {
-    console.log("index", index);
-    console.log("index == 0", index == 0);
-    if(index == 0) {
-      return;
-    }else{
-      console.log("index reduceIndex", index - 1);
+    if (index == 0) {
+      setIndex(dataObject.length - 1);
+    } else {
       setIndex(index - 1);
     }
   }
 
   const increaseIndex = (index) => {
-    console.log("index", index);
-    console.log("dataObject.length", dataObject.length);
-    if(index == dataObject.length - 1) {
-      return;
-    }else {
-      console.log("index increaseIndex", index + 1);
+    if (index == dataObject.length - 1) {
+      setIndex(0);
+    } else {
       setIndex(index + 1);
     }
   }
@@ -165,11 +179,11 @@ const ObjectStudy = ({
     <View style={styles.wrapper}>
       {
         dataObject && dataObject.length > 0 && (
-          <View style={{ height: "100%", width: "100%", backgroundColor: "gray" }}>
-            <View style={{ width: "100%", alignItems: "center", backgroundColor: "red" }}>
-              <Text style={{ fontSize: 20, fontWeight: "bold", color: "#0072bc" }}>{dataObject[0].label}</Text>
+          <View style={{ height: "100%", width: "100%"}}>
+            <View style={{ width: "100%", alignItems: "center", marginBottom: 20 }}>
+              <Text style={{ fontSize: 20, fontWeight: "bold", color: "#0072bc" }}>{dataObject[index].label}</Text>
             </View>
-            <View style={{ height: 200 }}>
+            <View style={{ height: 200, marginBottom: 20 }}>
               <VideoPlayer
                 source={{
                   uri: dataObject[index].uriVideo
@@ -182,32 +196,32 @@ const ObjectStudy = ({
                 }}
               />
             </View>
-            <View style={{ width: "100%", alignItems: "center", backgroundColor: "green" }}>
+            <View style={{ width: "100%", alignItems: "center", marginBottom: 20 }}>
               <Image
-                style={{ height: 200, width: 200 }}
+                style={{ height: 160, width: 200 }}
                 source={{
                   uri: dataObject[index].uriImg
                 }}
               />
             </View>
-            <View style={{ display: "flex", flexDirection: "row", justifyContent: "space-around", width: "100%", backgroundColor: "#d0d0d0" }}>
+            <View style={{ display: "flex", flexDirection: "row", justifyContent: "space-around", width: "100%", marginBottom: 30 }}>
               <Icon
                 style={{ width: 32, height: 32 }}
                 fill='#0072bc'
                 name='arrow-ios-back-outline'
-                onPress={() => {reduceIndex(index)}}
+                onPress={() => { reduceIndex(index) }}
               />
               <Icon
                 style={{ width: 32, height: 32 }}
                 fill='#0072bc'
                 name='volume-up-outline'
-                onPress={() => {playSound(dataObject[index].uriAudio)}}
+                onPress={() => { playSound(dataObject[index].uriAudio) }}
               />
               <Icon
                 style={{ width: 32, height: 32 }}
                 fill='#0072bc'
                 name='arrow-ios-forward-outline'
-                onPress={() => {increaseIndex(index)}}
+                onPress={() => { increaseIndex(index) }}
               />
             </View>
           </View>
@@ -227,7 +241,6 @@ const LearnItem = () => {
   useEffect(() => {
     // lấy dữ liệu
     const _learnItems = loadDataDetail(route.params.detail);
-    console.log("_learnItems useEffect", _learnItems);
     // // tạo file ảnh, audio trên thiết bị
     // createFileInDevice(_learnItems);
   }, [])
@@ -262,6 +275,8 @@ const LearnItem = () => {
       }
       setImgBase64s(_imageBase64s);
     } catch (error) {
+      let data = await read(SHEMAS_NAME.WORDITEM);
+      await deleteRealm(data);
       console.log("Error loadImage", error);
     }
   }
@@ -269,6 +284,7 @@ const LearnItem = () => {
   // lấy dữ liệu học tập
   const loadDataDetail = async (param) => {
     try {
+      setLoading(true);
       let data = await read(SHEMAS_NAME.WORDITEM);
       const dataPath = data.filter((item) => item.path == `/${he.decode(route.params.labelParent)}/${he.decode(route.params.title)}`);
       let _learnItems = [];
@@ -280,7 +296,6 @@ const LearnItem = () => {
         // load ảnh
         handleLoadImage(_learnItems);
       } else {
-        setLoading(true);
         console.log("no data");
         const endPoint = "http://aigle.blife.ai/taoItems/Items/getOntologyData";
         const cookie = await AsyncStorage.getItem("@cookie");
@@ -304,11 +319,11 @@ const LearnItem = () => {
 
         _learnItems = await _readLearnDetail(response.data.tree);
         setLearnItems(_learnItems);
-        setLoading(false);
         // load ảnh
-        handleLoadImage(_learnItems);
+        await handleLoadImage(_learnItems);
         // tạo file ảnh, audio trên thiết bị
-        createFileInDevice(_learnItems);
+        await createFileInDevice(_learnItems);
+        setLoading(false);
       }
       return _learnItems;
     } catch (error) {
@@ -351,25 +366,31 @@ const LearnItem = () => {
   const createFileInDevice = async (_learnItems) => {
     try {
       // save file base64
-      console.log("learnItems createFileInDevice", _learnItems);
-      console.log("createFileInDevice", learnItems);
       for (var i = 0; i < _learnItems.length; i++) {
         const singleLinkFile = _learnItems[i];
         // save file image
-        const tailBase64Img = await getLinkFile(singleLinkFile.linkImg);
-        await fs.mkdir(fs.DocumentDirectoryPath + `/images/${he.decode(route.params.labelParent)}/${he.decode(route.params.title)}`);
-        await fs.writeFile(fs.DocumentDirectoryPath + `/images/${he.decode(route.params.labelParent)}/${he.decode(route.params.title)}/${singleLinkFile.label}.${tailBase64Img.tail}`, tailBase64Img.base64, "base64")
+        if (singleLinkFile.linkImg) {
+          const tailBase64Img = await getLinkFile(singleLinkFile.linkImg);
+          console.log("save image");
+          await fs.mkdir(fs.DocumentDirectoryPath + `/images/${he.decode(route.params.labelParent)}/${he.decode(route.params.title)}`);
+          await fs.writeFile(fs.DocumentDirectoryPath + `/images/${he.decode(route.params.labelParent)}/${he.decode(route.params.title)}/${singleLinkFile.label}.${tailBase64Img.tail}`, tailBase64Img.base64, "base64")
+        }
 
         // save file audio
-        const tailBase64Audio = await getLinkFile(singleLinkFile.linkAudio)
-        await fs.mkdir(fs.DocumentDirectoryPath + `/audios/${he.decode(route.params.labelParent)}/${he.decode(route.params.title)}`);
-        await fs.writeFile(fs.DocumentDirectoryPath + `/audios/${he.decode(route.params.labelParent)}/${he.decode(route.params.title)}/${singleLinkFile.label}.${tailBase64Audio.tail}`, tailBase64Audio.base64, "base64")
+        if (singleLinkFile.linkAudio) {
+          const tailBase64Audio = await getLinkFile(singleLinkFile.linkAudio);
+          console.log("save audio");
+          await fs.mkdir(fs.DocumentDirectoryPath + `/audios/${he.decode(route.params.labelParent)}/${he.decode(route.params.title)}`);
+          await fs.writeFile(fs.DocumentDirectoryPath + `/audios/${he.decode(route.params.labelParent)}/${he.decode(route.params.title)}/${singleLinkFile.label}.${tailBase64Audio.tail}`, tailBase64Audio.base64, "base64")
+        }
 
         //save file video
-        const tailBase64Video = await getLinkFile(singleLinkFile.linkVideo)
-        console.log("save video");
-        await fs.mkdir(fs.DocumentDirectoryPath + `/videos/${he.decode(route.params.labelParent)}/${he.decode(route.params.title)}`);
-        await fs.writeFile(fs.DocumentDirectoryPath + `/videos/${he.decode(route.params.labelParent)}/${he.decode(route.params.title)}/${singleLinkFile.label}.${tailBase64Video.tail}`, tailBase64Video.base64, "base64")
+        if (singleLinkFile.linkVideo) {
+          const tailBase64Video = await getLinkFile(singleLinkFile.linkVideo)
+          console.log("save video");
+          await fs.mkdir(fs.DocumentDirectoryPath + `/videos/${he.decode(route.params.labelParent)}/${he.decode(route.params.title)}`);
+          await fs.writeFile(fs.DocumentDirectoryPath + `/videos/${he.decode(route.params.labelParent)}/${he.decode(route.params.title)}/${singleLinkFile.label}.${tailBase64Video.tail}`, tailBase64Video.base64, "base64")
+        }
       }
     } catch (error) {
       console.log("Error createFileIndevice", error);
@@ -429,17 +450,15 @@ const LearnItem = () => {
 
   const changeShowView = (val) => {
     setIsShowList(val);
-    if (val) {
-      console.log("learnItems changeShowView", learnItems);
-    }
   }
 
   return (
     <View style={styles.wrapper}>
       {
         loading ? (
-          <View style={{ width: "100%", height: "10%", alignItems: "center", justifyContent: "center", backgroundColor: "gray" }}>
+          <View style={{ width: "100%", height: "50%", alignItems: "center", justifyContent: "center" }}>
             <Spinner />
+            <Text style={{color: "#0072bc", marginTop: 20}}>Hệ thống đang thực hiện đồng bộ dữ liệu</Text>
           </View>
         ) : (
             <View style={{ width: "100%", height: "100%" }}>
@@ -448,14 +467,14 @@ const LearnItem = () => {
                   isShowList ? (
                     <Icon
                       style={{ width: 32, height: 32 }}
-                      fill='#8F9BB3'
+                      fill='#0072bc'
                       name='square-outline'
                       onPress={() => changeShowView(false)}
                     />
                   ) : (
                       <Icon
                         style={{ width: 32, height: 32 }}
-                        fill='#8F9BB3'
+                        fill='#0072bc'
                         name='grid-outline'
                         onPress={() => changeShowView(true)}
                       />

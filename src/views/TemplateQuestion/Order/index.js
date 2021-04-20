@@ -9,7 +9,9 @@ export default ({
   dataQuestion,
   onNextQuestion,
   loading,
-  questionIndex
+  questionIndex,
+  totalQuestion,
+  hanleEndTest
 }) => {
   // const [loading, setLoading] = useState(true)
   const [selected, setSelected] = useState({})
@@ -17,18 +19,6 @@ export default ({
 
   const [choose, setChoose] = useState("FALSE");
 
-  useEffect(() => {
-    // initLoading()
-  }, [])
-
-  // const initLoading = () => {
-  //   if (dataQuestion.question.trim()) {
-  //     setLoading(false)
-  //   }
-  //   else {
-  //     setLoading(true)
-  //   }
-  // }
   const testAnswer = dataQuestion.answers;
   const handlePressItem = (item, numberSelected) => () => {
     const _selected = { ...selected }
@@ -47,31 +37,77 @@ export default ({
     setSelected(_selected)
   }
 
-  const _onPress = async () => {
-    let answerChoice = [];
+  const handleMoveItem = async () => {
+    try {
+      let answerChoice = [];
     selectdValues && selectdValues.length > 0 && selectdValues.map((item, index) => {
       answerChoice.push(item.identifier);
     })
-    let itemResponse = `{"RESPONSE":{"list":{"identifier":${answerChoice}}}}`;
 
-    let itemState = `{"RESPONSE":{"response":{"list":{"identifier":${answerChoice}}}}}`;
+    if (answerChoice && answerChoice.length > 0) {
+      let itemResponse = {
+        "RESPONSE":
+        {
+          "list":
+          {
+            "identifier": answerChoice
+          }
+        }
+      }
 
-    let itemDuration = Date.now() - startTime;
-    const dataParam = await dataparam(false);
-    dataParam.itemDefinition = "item-" + questionIndex;
-    console.log("index", dataQuestion.token);
-    console.log("index", dataParam.testDefinition);
-    console.log("index", dataParam.testCompilation);
-    console.log("index", dataParam.serviceCallId);
-    console.log("index", itemResponse);
-    console.log("index", itemState);
-    console.log("index", itemDuration);
-    const response = moveitem(dataQuestion.token, dataParam, {
-      itemResponse,
-      itemState,
-      itemDuration
-    });
-    onNextQuestion();
+      let itemState = {
+        "RESPONSE":
+        {
+          "response":
+          {
+            "list":
+            {
+              "identifier":answerChoice
+            }
+          }
+        }
+      }
+
+      let itemDuration = Date.now() - startTime;
+      const dataParam = {
+        testDefinition: dataQuestion.paramTest.testDefinition,
+        testCompilation: dataQuestion.paramTest.testCompilation,
+        serviceCallId: dataQuestion.paramTest.serviceCallId
+      }; 
+      dataParam.itemDefinition = dataQuestion.itemIdentifier;
+      const data = await moveitem(dataQuestion.token, dataParam, {
+        "itemResponse": JSON.stringify(itemResponse),
+        "itemState": JSON.stringify(itemState),
+        "itemDuration": itemDuration
+      });
+
+      return data;
+    } else {
+      alert("Bạn chưa chọn câu trả lời:))");
+    }
+    } catch (error) {
+      console.log("Error hanleMoveItem", error);
+    }
+  }
+
+  const _onPress = async () => {
+    const data = await handleMoveItem();
+    if (data && data.success) {
+      console.log("Lưu thành công!!");
+      onNextQuestion(data.testContext.itemIdentifier, data.token);
+    } else {
+      console.log("Lưu thất bại!!");
+    }
+  }
+
+  const _onPressEnd = async () => {
+    const data = await handleMoveItem();
+    if (data && data.success) {
+      console.log("Lưu thành công!!");
+      hanleEndTest();
+    } else {
+      console.log("Lưu thất bại!!");
+    }
   }
 
   const selectdValues = useMemo(() => Object.values(selected), [selected])
@@ -118,12 +154,25 @@ export default ({
         </View>
       </View>
       <View>
-        <Button
-          disabled={loading}
-          onPress={_onPress}
-        >
-          {"Đồng ý"}
-        </Button>
+        {
+          questionIndex === totalQuestion ? (
+            <Button
+              disabled={loading}
+              onPress={_onPressEnd}
+              style={{ marginTop: 10 }}
+            >
+              {"Kết thúc"}
+            </Button>
+          ) : (
+              <Button
+                disabled={loading}
+                onPress={_onPress}
+                style={{ marginTop: 10 }}
+              >
+                {"Đồng ý"}
+              </Button>
+            )
+        }
       </View>
     </View>
   );

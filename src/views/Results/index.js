@@ -7,6 +7,7 @@ import { Spinner, Button } from '@ui-kitten/components';
 import styles from './styles';
 import { FlatList } from 'react-native-gesture-handler';
 import { RESULTS, RESULTDETAIL } from 'consts/screens';
+import { getUserResults } from 'service/userResult';
 export default () => {
   const navigation = useNavigation();
   const route = useRoute();
@@ -18,29 +19,18 @@ export default () => {
   });
 
   useEffect(() => {
-    loadResult(route.params)
+    console.log("route", route);
+    loadResult(route.params.name)
   }, [])
 
-  const loadResult = async (data) => {
+  const loadResult = async (param) => {
     try {
       setLoading(true);
-      const endPoint = "http://aigle.blife.ai/taoOutcomeUi/Results/getResults";
-      const cookie = await AsyncStorage.getItem("@cookie");
-      const response = await Axios.get(endPoint, {
-        headers: {
-          Cookie: cookie,
-          'X-Requested-With': 'XMLHttpRequest'
-        },
-        params: {
-          'classUri': data.name.attributes["data-uri"],
-          'rows': 25,
-          'page': 1,
-          'sortby': 'id',
-          'sortorder': 'asc',
-          'sorttype': 'string'
-        }
-      })
-      _readResult(response.data);
+      console.log("router attributes", param);
+      const dataUri = param.attributes["data-uri"];
+      console.log("dataUri loadResult", dataUri);
+      const data = await getUserResults(dataUri);
+      _readResult(data);
       setLoading(false);
     } catch (error) {
       setLoading(false);

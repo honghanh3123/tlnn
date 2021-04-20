@@ -1,69 +1,230 @@
-import React, { Fragment, useState, useEffect } from 'react';
-import { Button, List } from '@ui-kitten/components';
-import { View, Text, Modal, Alert, TouchableHighlight, StyleSheet, TouchableNativeFeedback, StatusBar, VirtualizedList, RefreshControl } from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Button, Spinner, Layout, Tab, TabView } from '@ui-kitten/components';
+import { View, Text, ScrollView } from 'react-native';
 import styles from './styles';
-import { useNavigation } from '@react-navigation/native';
-import { STARTTEST, RESULTS } from 'consts/screens';
-import { set } from 'react-native-reanimated';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import { STARTTEST } from 'consts/screens';
 import { getExams } from 'service/test';
-import { FlatList } from 'react-native-gesture-handler';
-import { getResults } from 'service/result';
-import dataResult from 'service/hooks/dataResult';
-import Results from 'views/Results';
+
+// tab đang làm
+const TabDoing = ({
+  dataExam
+}) => {
+  const navigation = useNavigation();
+  const [loading, setLoading] = useState(true);
+  const [dataResource, setDataResource] = useState([]);
+
+  useEffect(() => {
+    loadData();
+  }, [dataExam]);
+
+  const loadData = () => {
+    try {
+      let data = [];
+      dataExam.map(item => {
+        if(item.type == 1) {
+          data.push(item);
+        }
+      });
+      setDataResource(data);
+      setLoading(false);
+    } catch (error) {
+      console.log("Error loadData doing", error);
+    }
+  }
+
+  const _onPress = (apiQuestion) => {
+    navigation.navigate(STARTTEST, {
+      apiQuestion: apiQuestion
+    })
+  }
+
+  return (
+    <View style={styles.wrapperTest}>
+      {
+        loading ? (
+          <View style={{ width: "100%", height: "50%", alignItems: "center", justifyContent: "center" }}>
+            <Spinner />
+            <Text style={{ color: "#0072bc", marginTop: 20 }}>Vui lòng chờ giây lát.</Text>
+          </View>
+        ) : (
+            <ScrollView>
+              {
+                dataResource.map((item, key) => (
+                  <View style={styles.testItem} key={key}>
+                    <View style={[styles.testBorderLeft, { backgroundColor: "#0E47BA" }]}></View>
+                    <View style={styles.testContent}>
+                      <Text style={[styles.testTitle, { color: "#0E47BA" }]}>{item.nameTest}</Text>
+                      <Text>{item.timeTest}</Text>
+                      <Text>{item.attempts}</Text>
+                      <View style={{ width: "100%", display: "flex", alignItems: "flex-end" }}>
+                        <Button onPress={() => _onPress(item.apiQuestion)}
+                          style={styles.btnFooter}>
+                          Bắt đầu
+                        </Button>
+                      </View>
+                    </View>
+                  </View>
+                ))
+              }
+            </ScrollView>
+          )
+      }
+    </View>
+  )
+}
+
+// tab chưa làm
+const TabUnfinish = ({
+  dataExam
+}) => {
+  const navigation = useNavigation();
+  const [loading, setLoading] = useState(true);
+  const [dataResource, setDataResource] = useState([]);
+
+  useEffect(() => {
+    loadData();
+  }, [dataExam]);
+
+  const loadData = () => {
+    try {
+      let data = [];
+      dataExam.map(item => {
+        if(item.type == 2) {
+          data.push(item);
+        }
+      });
+
+      setDataResource(data);
+      setLoading(false);
+    } catch (error) {
+      console.log("Error loadData doing", error);
+    }
+  }
+
+  const _onPress = (apiQuestion) => {
+    console.log("apiQuestion", apiQuestion);
+    navigation.navigate(STARTTEST, {
+      apiQuestion: apiQuestion
+    })
+  }
+
+  return (
+    <View style={styles.wrapperTest}>
+      {
+        loading ? (
+          <View style={{ width: "100%", height: "50%", alignItems: "center", justifyContent: "center" }}>
+            <Spinner />
+            <Text style={{ color: "#0072bc", marginTop: 20 }}>Vui lòng chờ giây lát.</Text>
+          </View>
+        ) : (
+            <ScrollView>
+              {
+                dataResource.map((item, key) => (
+                  <View style={styles.testItem} key={key}>
+                    <View style={[styles.testBorderLeft, { backgroundColor: "#45BA0E" }]}></View>
+                    <View style={styles.testContent}>
+                      <Text style={[styles.testTitle, { color: "#45BA0E" }]}>{item.nameTest}</Text>
+                      <Text>{item.timeTest}</Text>
+                      <Text>{item.attempts}</Text>
+                      <View style={{ width: "100%", display: "flex", alignItems: "flex-end" }}>
+                        <Button style={styles.btnFooter} onPress={() => _onPress(item.apiQuestion)}>
+                          Bắt đầu
+                        </Button>
+                      </View>
+                    </View>
+                  </View>
+                ))
+              }
+            </ScrollView>
+          )
+      }
+    </View>
+  )
+}
+
+// tab hoàn thành
+const TabFinished = ({
+  dataExam
+}) => {
+
+  const [loading, setLoading] = useState(true);
+  const [dataResource, setDataResource] = useState([]);
+
+  useEffect(() => {
+    loadData();
+  }, [dataExam]);
+
+  const loadData = () => {
+    try {
+      let data = [];
+      dataExam.map(item => {
+        if(item.type == 3) {
+          data.push(item);
+        }
+      });
+
+      setDataResource(data);
+      setLoading(false);
+    } catch (error) {
+      console.log("Error loadData doing", error);
+    }
+  }
+
+  return (
+    <View style={styles.wrapperTest}>
+      {
+        loading ? (
+          <View style={{ width: "100%", height: "50%", alignItems: "center", justifyContent: "center" }}>
+            <Spinner />
+            <Text style={{ color: "#0072bc", marginTop: 20 }}>Vui lòng chờ giây lát.</Text>
+          </View>
+        ) : (
+            <ScrollView>
+              {
+                dataResource.map((item, key) => (
+                  <View style={styles.testItem} key={key}>
+                    <View style={[styles.testBorderLeft, { backgroundColor: "#949292" }]}></View>
+                    <View style={styles.testContent}>
+                      <Text style={[styles.testTitle, { color: "#949292" }]}>{item.nameTest}</Text>
+                      <Text>{item.timeTest}</Text>
+                      <Text>{item.attempts}</Text>
+                      <View style={{ width: "100%", display: "flex", alignItems: "flex-end" }}>
+                        <Button style={styles.btnFooter} disabled={true}>
+                          Hoàn thành
+                        </Button>
+                      </View>
+                    </View>
+                  </View>
+                ))
+              }
+            </ScrollView>
+          )
+      }
+    </View>
+  )
+}
 
 export default () => {
-  const navigation = useNavigation();
-  const [mode, setMode] = useState("DOING")
-  const [exam, setExam] = useState(0);
-  const [processExam, setProcessExam] = useState({
-    dataSource: [],
-    loading: true
-  });
-
-  const [availabelExam, setAvailabelExam] = useState({
-    dataSource: [],
-    loading: true
-  })
-
-  const [result, setResult] = useState({
-    attributes: {},
-    children: [],
-    loading: true
-  })
-
+  const [dataExam, setDataExam] = useState([]);
+  const [countProcessExam, setCountProcessExam] = useState(0);
+  const [countAvailabelExam, setCountAvailabelExam] = useState(0);
+  const [selectedIndex, setSelectedIndex] = useState(0);
   useEffect(() => {
     loadExam();
   }, [])
 
+  useFocusEffect(
+    useCallback(() => {
+      loadExam()
+    }, [])
+  );
+
   const loadExam = async () => {
-    setProcessExam({
-      ...processExam,
-      loading: true
-    })
-    setAvailabelExam({
-      ...availabelExam,
-      loading: true
-    })
     response = await getExams();
-    setExam(response);
-    setProcessExam({
-      dataSource: response.processExam,
-      loading: false
-    });
-    setAvailabelExam({
-      dataSource: response.availabelExam,
-      loading: false
-    });
-  }
-
-  const [visible, setVisiable] = useState(false);
-
-  setModalVisible = () => {
-    setVisiable(!this.visible);
-  }
-
-  const _onPress = () => {
-    navigation.navigate(STARTTEST)
+    setDataExam(response.resultData);
+    setCountProcessExam(response.countProcessExam);
+    setCountAvailabelExam(response.countAvailabelExam);
   }
 
   return (
@@ -71,80 +232,26 @@ export default () => {
       <Text style={styles.wrapperTitle}>
         Bài kiểm tra
       </Text>
-      <View style={styles.inlineButton}>
-        <Button
-          onPress={() => setMode("DOING")}
-          appearance={mode == "DOING" ? "filled" : 'outline'} 
-          status={mode === "DOING" ? "warning" : "basic"}
-        >
-          Chưa làm
-          </Button>
-        <Button
-          onPress={() => setMode("DONE")}
-          appearance={mode == "DONE" ? "filled" : 'outline'} 
-          status={mode === "DONE" ? "warning" : "basic"}
-        >
-          Đã làm
-        </Button>
-      </View>
-      <View style={styles.wrapperTest}>
-        {(mode == "DOING") ? (
-        <FlatList
-          keyExtractor={item => item.nameTest}
-          data={processExam.dataSource}
-          refreshControl={(
-            <RefreshControl 
-              colors={["#0082ff"]}
-              refreshing={processExam.loading}
-            />
-          )}
-          renderItem={({ item }) => {
-            return <View style={styles.testItem}>
-              <View style={styles.testBorderLeftGreen}></View>
-              <View style={styles.testContent}>
-                <Text style={styles.testTitleGreen}>{item.nameTest}</Text>
-                <Text style={styles.testTime}>{item.timeTest}</Text>
-                <Text style={styles.createTime}>{item.attempts}</Text>
-                <View style={{width: "100%", display: "flex", alignItems: "flex-end"}}>
-                <Button onPress={_onPress}
-                  style={styles.btnFooter}>
-                    Bắt đầu
-                  </Button>
-                  </View>
-              </View>
-            </View>
-          }}
-        />
-        ) : (
-          <FlatList
-              keyExtractor={item => item.nameTest}
-              data={availabelExam.dataSource}
-              refreshControl={(
-                <RefreshControl 
-                  colors={["#0082ff"]}
-                  refreshing={availabelExam.loading}
-                />
-              )}
-              renderItem={({ item }) => {
-                return <View>
-                  <View style={styles.testItem}>
-                    <View style={styles.testBorderLeftBlue}></View>
-                    <View style={styles.testContent}>
-                      <Text style={styles.testTitleBlue}>{item.nameTest}</Text>
-                      <Text style={styles.testTime}>{item.timeTest}</Text>
-                      <Text style={styles.createTime}>{item.attempts}</Text>
-                      <View style={{width: "100%", display: "flex", alignItems: "flex-end"}}>
-                      <Button style={styles.btnFooter}>
-                          Bắt đầu
-                      </Button>
-                      </View>
-                    </View>
-                  </View>
-                </View>
-              }}
-            />
-        )}
-      </View>
+      <TabView
+        selectedIndex={selectedIndex}
+        onSelect={index => setSelectedIndex(index)}
+        style={{width: "100%", height: "100%"}}>
+        <Tab title='Đang làm'>
+          <Layout style={styles.layout}>
+            <TabDoing dataExam={dataExam}></TabDoing>
+          </Layout>
+        </Tab>
+        <Tab title='Chưa làm'>
+          <Layout style={styles.layout}>
+            <TabUnfinish dataExam={dataExam}></TabUnfinish>
+          </Layout>
+        </Tab>
+        <Tab title='Hoàn thành'>
+          <Layout style={styles.layout}>
+            <TabFinished dataExam={dataExam}></TabFinished>
+          </Layout>
+        </Tab>
+      </TabView>
     </View>
   )
 }
