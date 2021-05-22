@@ -4,7 +4,7 @@ import * as eva from '@eva-design/eva';
 import { ApplicationProvider, IconRegistry } from '@ui-kitten/components';
 import { EvaIconsPack } from '@ui-kitten/eva-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import SplashScreen from  "react-native-splash-screen";
 import Views from 'views';
 import { RootContext } from 'utils';
 
@@ -16,7 +16,7 @@ export default () => {
   const [isSynchronizing, setIsSynchronizing] = useState(false);
 
   useEffect(() => {
-    //handleSaveDataToRealm();
+    SplashScreen.hide();
   }, [])
 
   handleSaveDataToRealm = async () => {

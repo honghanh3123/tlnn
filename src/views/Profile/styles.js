@@ -1,39 +1,42 @@
-import { StyleSheet } from "react-native";
-import { block } from "react-native-reanimated";
-import { Autocomplete } from "@ui-kitten/components";
+import { StyleSheet, Dimensions } from "react-native";
+
+const screenWidth = Dimensions.get("screen").width
+const screenHeight = Dimensions.get("screen").height
 
 export default StyleSheet.create({
   wrapper: {
+    margin: 10
+  },
+
+  wrap_user_info: {
+    width: "100%", 
+    display: "flex", 
+    justifyContent: "center", 
+    alignItems: "center", 
+    height: 280,
+    backgroundColor: "#fff",
+    borderRadius: 8
+  },
+
+  avata_user: {
+    backgroundColor: '#194960', 
+    borderRadius: 80, 
+    width: 160, 
+    height: 160, 
+    display: "flex", 
+    justifyContent: "center", 
+    alignItems: "center"
+  },
+
+  info_item: {
+    height: 50,
+    paddingLeft: 20,
+    paddingRight: 20,
     display: "flex",
     alignItems: "center",
-    justifyContent: "center",
-    margin: 5
-  },
-
-  wrapperTitle: {
-    marginTop: 40,
-    marginBottom: 20,
-    fontSize: 28,
-    fontWeight: "bold"
-  },
-
-  inlineButton: {
-    display: "flex",
-    flexDirection: "row"
-  },
-
-  btnNotDo: {
-    width: 156,
-    height: 32,
-    marginTop: 20,
-    marginRight: 20,
-    borderRadius: 5
-  },
-
-  btnDone: {
-    width: 156,
-    height: 32,
-    marginTop: 20,
-    borderRadius: 5
+    flexDirection: "row",
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    marginTop: 8
   }
 })

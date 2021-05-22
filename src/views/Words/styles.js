@@ -13,13 +13,12 @@ export default StyleSheet.create({
 
   wrapperTitle: {
     marginTop: 30,
-    marginBottom: 20,
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: "bold"
   },
 
   wrapperTest: {
-    marginTop: 50,
+    marginTop: 30,
     width: "100%",
     flex: 1
   },

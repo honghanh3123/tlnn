@@ -4,9 +4,12 @@ import { View, Text } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Axios from 'axios';
 import { DOMParser } from 'react-native-html-parser';
+import styles from './styles';
 export default () => {
   const navigation = useNavigation();
   const route = useRoute();
+  const [totalScore, setTotalScore] = useState(0);
+  const [totalMaxScore, setTotalMaxScore] = useState(0);
   const [loading, setLoading] = useState(true);
   const [dataResult, setDataResult] = useState({
     "id": "",
@@ -44,6 +47,7 @@ export default () => {
         const result = parser.parseFromString(data, "text/html");
         var results = [], totalScore = 0, totalMaxScore = 0;
         const questions = result.getElementsByClassName('matrix');
+        let totalCorrect = 0;
         for (var i = 0; i < questions.length; i++) {
           const tbody = questions[i].getElementsByTagName('tbody')[0];
           if (tbody.getElementsByTagName('tr')[6] && tbody.getElementsByTagName('tr')[3]) {
@@ -51,12 +55,12 @@ export default () => {
               .getElementsByTagName('tr')[6]
               .getElementsByClassName('dataResult')[0]
               .firstChild.data;
-              score = Number(score);
+            score = Number(score);
 
             let maxScore = tbody
-            .getElementsByTagName('tr')[7]
-            .getElementsByClassName('dataResult')[0]
-            .firstChild.data;
+              .getElementsByTagName('tr')[7]
+              .getElementsByClassName('dataResult')[0]
+              .firstChild.data;
 
             maxScore = Number(maxScore);
             console.log("maxScore", maxScore);
@@ -77,7 +81,11 @@ export default () => {
           }
         }
 
+        console.log("totalScore", totalScore);
+        console.log("totalMaxScore", totalMaxScore);
         console.log("results", results);
+        setTotalMaxScore(totalMaxScore);
+        setTotalScore(totalScore);
       }
     } catch (error) {
       console.log("Lỗi đọc html _readResult", error);
@@ -85,8 +93,27 @@ export default () => {
   }
 
   return (
-    <View>
-      <Text>abc</Text>
+    <View style={{ display: "flex", justifyContent: "center" }}>
+      <View style={styles.info_item}>
+        <View style={{ marginLeft: 10 }}>
+          <Text style={{ fontSize: 16 }}>Tổng số câu hỏi: {totalMaxScore}</Text>
+        </View>
+      </View>
+      <View style={styles.info_item}>
+        <View style={{ marginLeft: 10 }}>
+          <Text style={{ fontSize: 16 }}>Tổng số câu trả lời đúng: {totalScore}</Text>
+        </View>
+      </View>
+
+      {
+        totalMaxScore ? (
+          <View style={styles.info_item}>
+            <View style={{ marginLeft: 10 }}>
+              <Text style={{ fontSize: 16 }}>Phần trăm trả lời đúng: {totalScore / totalMaxScore}</Text>
+            </View>
+          </View>
+        ) : (<></>)
+      }
     </View>
   )
 }

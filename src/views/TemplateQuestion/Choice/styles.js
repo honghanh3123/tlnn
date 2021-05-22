@@ -13,17 +13,19 @@ export default StyleSheet.create({
   },
 
   question: {
-    fontSize: 22,
+    fontSize: 14,
     fontWeight: "bold",
     marginBottom: 10
   },
 
   wrapContent: {
-    height: "70%",
+    // height: "70%",
     width: "100%",
     display: "flex",
     justifyContent: "center",
-    alignItems: "center"
+    alignItems: "center",
+    position: "absolute",
+    bottom: 80
   },
 
   wrapItem: {

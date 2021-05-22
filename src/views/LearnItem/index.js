@@ -126,6 +126,8 @@ const ObjectStudy = ({
       ])
       item.uriVideo = uriVideo;
       item.uriAudio = uriAudio;
+      console.log("uriVideo", uriVideo);
+      console.log("uriAudio", uriAudio);
       const _base64Img = await fs.readFile(uriImg, "base64");
       item.uriImg = `data:image/${uriImg.split(".").pop()};base64,${_base64Img}`;
       return item;
@@ -339,13 +341,13 @@ const LearnItem = () => {
       if (result && result.length > 0) {
         promisesGetItemData = result.map(item => {
           _dataStudy.push({
-            "label": item.data,
-            "count": item.count,
-            "attributes": {
-              "data-classUri": item.attributes["data-classUri"],
-              "data-uri": item.attributes["data-uri"],
-              "id": item.attributes["id"]
-            }
+              "label": item.data,
+              "count": item.count,
+              "attributes": {
+                "data-classUri": item.attributes["data-classUri"],
+                "data-uri": item.attributes["data-uri"],
+                "id": item.attributes["id"]
+              }
           })
           return getDataFile(item.attributes["data-uri"])
         })

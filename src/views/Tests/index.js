@@ -222,9 +222,19 @@ export default () => {
 
   const loadExam = async () => {
     response = await getExams();
-    setDataExam(response.resultData);
-    setCountProcessExam(response.countProcessExam);
-    setCountAvailabelExam(response.countAvailabelExam);
+    if(response) {
+      if(response.resultData) {
+        setDataExam(response.resultData);
+      }
+      
+      if(response.countProcessExam) {
+        setCountProcessExam(response.countProcessExam);
+      }
+
+      if(response.countAvailabelExam) {
+        setCountAvailabelExam(response.countAvailabelExam);
+      }
+    }
   }
 
   return (

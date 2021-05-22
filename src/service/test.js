@@ -1,12 +1,14 @@
 import { apiExam } from "apis/exam"
 import { DOMParser } from 'react-native-html-parser';
 import { result } from "lodash";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import Axios from "axios";
 
 export const getExams = async () => {
 	try {
 		//call api
 		const response = await apiExam();
-		if (response.includes("</div>")) {
+		if (response && response.includes("body")) {
 			const parser = new DOMParser();
 			let result = parser.parseFromString(response, "text/html");
 
@@ -32,6 +34,8 @@ export const getExams = async () => {
 				countProcessExam: processExam.length,
 				countAvailabelExam: dataExam.availabelExam.length
 			};
+		} else {
+			alert("Hệ thống đang bảo trì")
 		}
 	} catch (error) {
 		console.log("Lỗi đọc html getExams", error);
@@ -131,4 +135,55 @@ export const removeDuplicate = (data) => {
 		}
 	}
 	return data;
+}
+
+
+
+
+
+const serviceBase = async (schemaName, endPoint, params, headers, formData) => {
+	try {
+		const dataRealm = await read(schemaName);
+		if (dataRealm) {
+			return dataRealm;
+		} else {
+			const dataAPI = await callAPIBase(endPoint, method, params, headers, formData);
+			const result = handleData(dataAPI); // hàm xử lý dữ liệu trước khi trả về UI System
+			await bulkCreate(schemaName, result); // lưu dữ liệu trong Realm Database
+			return result;
+		}
+	} catch (error) {
+		console.log("Error", error.response);
+	}
+}
+
+
+const callAPIBase = async (endPoint, method, params, headers, formData) => {
+	try {
+		const cookie = await AsyncStorage.getItem("@cookie");
+		let response;
+		switch (method) {
+			case "POST":
+				response = await Axios.post(endPoint, formData, {
+					headers: {
+						Cookie: cookie,
+						...headers
+					},
+					params: params
+				})
+				break;
+			case "GET":
+				response = await Axios.get(endPoint, {
+					headers: {
+						Cookie: cookie,
+						...headers
+					},
+					params: params
+				})
+				break;
+		}
+		return response;
+	} catch (error) {
+		console.log("Error", error.response);
+	}
 }

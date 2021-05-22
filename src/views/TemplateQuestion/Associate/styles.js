@@ -5,12 +5,11 @@ const screenHeight = Dimensions.get("screen").height
 
 export default StyleSheet.create({
   wrapper: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
     margin: 5,
-    height: "100%",
-    width: "100%"
+    width: screenWidth,
+    height:  "100%",
+    display: "flex", 
+    alignItems: "center"
   },
   
   wrapperTitle: {
@@ -20,16 +19,17 @@ export default StyleSheet.create({
   },
 
   question: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: "bold",
     marginBottom: 20
   },
 
   wrapContent: {
-    height: "80%",
     width: "100%",
     display: "flex",
-    alignItems: "center"
+    alignItems: "center",
+    position: "absolute",
+    bottom: 80,
   },
   wrapItem: {
     display: "flex", 
@@ -37,7 +37,7 @@ export default StyleSheet.create({
     flexWrap: "wrap", 
     alignItems: "center", 
     justifyContent: "center",
-    marginTop: 20
+    marginTop: 20,
   },
 
   wrapTopic: {
@@ -64,6 +64,6 @@ export default StyleSheet.create({
     justifyContent: "center", 
     alignItems: "center",
     width: screenWidth - 50,
-    flexWrap: "wrap"
+    flexWrap: "wrap",
   }
 })

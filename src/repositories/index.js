@@ -3,10 +3,14 @@ import 'react-native-get-random-values';
 import { v4 as uuidv4 } from 'uuid';
 import wordDir from './schemas/wordDir';
 import wordItem from './schemas/wordItem';
+import testDetail from './schemas/testDetail';
+import test from './schemas/test';
+import result from './schemas/result';
+import user from './schemas/user';
 
- const getRealm = () =>Realm.open({
+const getRealm = () => Realm.open({
   path: "com.tlnn",
-  schema: [wordDir, wordItem]
+  schema: [wordDir, wordItem, test, testDetail, result, user]
 });
 
 export default getRealm;
@@ -23,7 +27,7 @@ export const create = async (schemaName, data) => {
 }
 
 export const bulkCreate = async (schemaName, datas) => {
-  const realm = await getRealm(); 
+  const realm = await getRealm();
   return new Promise((resolve, reject) => {
     let objects;
     realm.write(() => {
@@ -33,7 +37,7 @@ export const bulkCreate = async (schemaName, datas) => {
   })
 }
 
-export const update = async(schemaName, cbQuery, data) => {
+export const update = async (schemaName, cbQuery, data) => {
   const realm = await getRealm();
   const dataUpdates = await cbQuery(realm.objects(schemaName));
   return new Promise((resolve, reject) => {

@@ -7,7 +7,6 @@ export default StyleSheet.create({
   wrapper: {
     display: "flex",
     alignItems: "center",
-    justifyContent: "center",
     margin: 5,
     height: "100%",
     width: "100%"
@@ -20,16 +19,17 @@ export default StyleSheet.create({
   },
 
   question: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: "bold",
     marginBottom: 20
   },
 
   wrapContent: {
-    height: "80%",
     width: "100%",
     display: "flex",
-    alignItems: "center"
+    alignItems: "center",
+    position: "absolute",
+    bottom: 80
   },
   wrapItem: {
     display: "flex", 

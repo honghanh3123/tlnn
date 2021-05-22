@@ -40,51 +40,51 @@ export default ({
   const handleMoveItem = async () => {
     try {
       let answerChoice = [];
-    selectdValues && selectdValues.length > 0 && selectdValues.map((item, index) => {
-      answerChoice.push(item.identifier);
-    })
+      selectdValues && selectdValues.length > 0 && selectdValues.map((item, index) => {
+        answerChoice.push(item.identifier);
+      })
 
-    if (answerChoice && answerChoice.length > 0) {
-      let itemResponse = {
-        "RESPONSE":
-        {
-          "list":
-          {
-            "identifier": answerChoice
-          }
-        }
-      }
-
-      let itemState = {
-        "RESPONSE":
-        {
-          "response":
+      if (answerChoice && answerChoice.length > 0) {
+        let itemResponse = {
+          "RESPONSE":
           {
             "list":
             {
-              "identifier":answerChoice
+              "identifier": answerChoice
             }
           }
         }
+
+        let itemState = {
+          "RESPONSE":
+          {
+            "response":
+            {
+              "list":
+              {
+                "identifier": answerChoice
+              }
+            }
+          }
+        }
+
+        let itemDuration = Date.now() - startTime;
+        const dataParam = {
+          testDefinition: dataQuestion.paramTest.testDefinition,
+          testCompilation: dataQuestion.paramTest.testCompilation,
+          serviceCallId: dataQuestion.paramTest.serviceCallId
+        };
+        dataParam.itemDefinition = dataQuestion.itemIdentifier;
+        const data = await moveitem(dataQuestion.token, dataParam, {
+          "itemResponse": JSON.stringify(itemResponse),
+          "itemState": JSON.stringify(itemState),
+          "itemDuration": itemDuration
+        });
+
+        return data;
+      } else {
+        alert("Bạn chưa chọn câu trả lời:))");
       }
-
-      let itemDuration = Date.now() - startTime;
-      const dataParam = {
-        testDefinition: dataQuestion.paramTest.testDefinition,
-        testCompilation: dataQuestion.paramTest.testCompilation,
-        serviceCallId: dataQuestion.paramTest.serviceCallId
-      }; 
-      dataParam.itemDefinition = dataQuestion.itemIdentifier;
-      const data = await moveitem(dataQuestion.token, dataParam, {
-        "itemResponse": JSON.stringify(itemResponse),
-        "itemState": JSON.stringify(itemState),
-        "itemDuration": itemDuration
-      });
-
-      return data;
-    } else {
-      alert("Bạn chưa chọn câu trả lời:))");
-    }
     } catch (error) {
       console.log("Error hanleMoveItem", error);
     }
@@ -113,7 +113,7 @@ export default ({
   const selectdValues = useMemo(() => Object.values(selected), [selected])
   return (
     <View style={styles.wrapper}>
-      <Text style={styles.question}>{dataQuestion.question || ""}</Text>
+      <Text style={styles.question}>{dataQuestion.question.label || ""}</Text>
       <View style={styles.wrapContent}>
         <View style={styles.wrapItem}>
           {
@@ -153,7 +153,7 @@ export default ({
           }
         </View>
       </View>
-      <View>
+      <View style={{position: "absolute", bottom: 10}}>
         {
           questionIndex === totalQuestion ? (
             <Button

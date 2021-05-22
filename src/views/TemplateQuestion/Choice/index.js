@@ -1,9 +1,10 @@
 import React, { Fragment, useState, useEffect, useRef, useMemo } from 'react';
-import { View, Text, TouchableNativeFeedback, TouchableHighlight } from 'react-native';
-import { Button, Spinner, Avatar } from '@ui-kitten/components';
+import { View, Text, TouchableNativeFeedback, TouchableHighlight, Image } from 'react-native';
+import { Button, Spinner, Avatar, Icon } from '@ui-kitten/components';
 import styles from './styles';
 import dataparam from 'service/hooks/dataparam';
 import { moveitem } from 'service/moveitem';
+import Sound from 'react-native-sound';
 export default ({
   dataQuestion,
   onNextQuestion,
@@ -63,7 +64,7 @@ export default ({
         });
 
         return data;
-        
+
       } else {
         alert("Bạn chưa chọn câu trả lời:))");
       }
@@ -109,10 +110,27 @@ export default ({
     }
     setSelected(_selected)
   }
-  const selectdValues = useMemo(() => Object.keys(selected), [selected])
+  const selectdValues = useMemo(() => Object.keys(selected), [selected]);
+
+  const playSound = (path) => {
+    const sound = new Sound(path, '', () => {
+      sound.play();
+    })
+  }
+
   return (
     <View style={styles.wrapper}>
-      <Text style={styles.question}>{dataQuestion.question || ""}</Text>
+      <Text style={styles.question}>{dataQuestion.question.label || ""}</Text>
+      {
+        dataQuestion.question.linkAudio ? (
+          <Icon
+            style={{ width: 32, height: 32 }}
+            fill='#0072bc'
+            name='volume-up-outline'
+            onPress={() => { playSound(dataQuestion.question.linkAudio) }}
+          />
+        ) : (<></>)
+      }
       <View style={styles.wrapContent}>
         <View style={styles.wrapItem}>
           {
@@ -125,8 +143,19 @@ export default ({
                   onPress={handlePressItem(item, 1)}
                 >
                   {
-                    () => <View style={{ width: 110, alignItems: "center", minHeight: 60, justifyContent: "center", display: "flex" }}>
-                      <Text>{item.value}</Text>
+                    () => <View style={{ width: 110, alignItems: "center", minHeight: 100, justifyContent: "center", display: "flex" }}>
+                      {
+                        item.type == "text" ? (
+                          <Text>{item.value}</Text>
+                        ) : item.type == "img" ? (
+                          <Image
+                            style={{ minHeight: 90, width: 100 }}
+                            source={{
+                              uri: item.value
+                            }}
+                          />
+                        ) : (<></>)
+                      }
                     </View>
                   }
                 </Button>
@@ -136,7 +165,7 @@ export default ({
           }
         </View>
       </View>
-      <View>
+      <View style={{ position: "absolute", bottom: 10 }}>
         {
           questionIndex === totalQuestion ? (
             <Button

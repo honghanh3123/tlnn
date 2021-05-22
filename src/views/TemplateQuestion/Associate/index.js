@@ -1,5 +1,5 @@
 import React, { Fragment, useState, useEffect, useMemo, useRef } from 'react';
-import { View, Text, TouchableNativeFeedback, TouchableHighlight } from 'react-native';
+import { View, Text, TouchableNativeFeedback, TouchableHighlight, Image } from 'react-native';
 import { Button, Spinner, Avatar } from '@ui-kitten/components';
 import dataparam from 'service/hooks/dataparam';
 import { moveitem } from 'service/moveitem';
@@ -129,7 +129,9 @@ export default ({
   const selectdValues = useMemo(() => Object.keys(selected), [selected]);
   return (
     <View style={styles.wrapper}>
-      <Text style={styles.question}>{dataQuestion.question || ""}</Text>
+      <View style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
+      <Text style={styles.question}>{dataQuestion.question.label || ""}</Text>
+      </View>
       <View style={styles.wrapContent}>
         <View style={styles.wrapItem}>
           {
@@ -183,7 +185,7 @@ export default ({
           }
         </View>
       </View>
-      <View>
+      <View style={{position: "absolute", bottom: 10}}>
         {
           questionIndex === totalQuestion ? (
             <Button
