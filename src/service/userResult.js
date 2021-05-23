@@ -2,7 +2,6 @@ import Axios from "axios";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const getUserResults = async (dataUri) => {
-  console.log("dataUri", dataUri);
   const endPoint = "http://aigle.blife.ai/taoOutcomeUi/Results/getResults";
   const cookie = await AsyncStorage.getItem("@cookie");
   const response = await Axios.get(endPoint, {

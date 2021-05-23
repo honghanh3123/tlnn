@@ -40,7 +40,6 @@ export default () => {
   loadResultByUser = async (children) => {
     try {
       const userName = "nobita";
-      console.log("children", children);
       let data = [];
       data = children.map(async item => {
         let details = await getUserResults(item.attributes["data-uri"]);
@@ -56,9 +55,7 @@ export default () => {
       })
 
       dataResultTest = await Promise.all(data);
-      console.log("dataResultTest", dataResultTest);
       dataResultTest = dataResultTest.filter(item => item != undefined);
-      // console.log("time", Date.now() - timeLoad);
       return dataResultTest;
     } catch (error) {
       console.log("Error load result by user", error);
@@ -66,7 +63,6 @@ export default () => {
   }
 
   const _handleViewResult = (item) => {
-    console.log("item", item);
     navigation.navigate(RESULTS, {
       name: item
     })

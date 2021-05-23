@@ -51,24 +51,6 @@ const Card = ({
     const sound = new Sound(path, '', () => {
       sound.play();
     })
-
-    // var whoosh = new Sound(path, Sound.MAIN_BUNDLE, (error) => {
-    //   if (error) {
-    //     console.log('failed to load the sound', error);
-    //     return;
-    //   }
-    //   // loaded successfully
-    //   console.log('duration in seconds: ' + whoosh.getDuration() + 'number of channels: ' + whoosh.getNumberOfChannels());
-    
-    //   // Play the sound with an onEnd callback
-    //   whoosh.play((success) => {
-    //     if (success) {
-    //       console.log('successfully finished playing');
-    //     } else {
-    //       console.log('playback failed due to audio decoding errors');
-    //     }
-    //   });
-    // });
   }
 
   return (
@@ -126,8 +108,6 @@ const ObjectStudy = ({
       ])
       item.uriVideo = uriVideo;
       item.uriAudio = uriAudio;
-      console.log("uriVideo", uriVideo);
-      console.log("uriAudio", uriAudio);
       const _base64Img = await fs.readFile(uriImg, "base64");
       item.uriImg = `data:image/${uriImg.split(".").pop()};base64,${_base64Img}`;
       return item;
@@ -137,10 +117,8 @@ const ObjectStudy = ({
 
   const getFilePath = async (pathDir, pathFileFirst) => {
     try {
-      console.log();
       const isExistFile = await fs.exists(pathDir);
       if (isExistFile) {
-        console.log("isExistFile");
         const files = await fs.readDir(pathDir);
         const file = files.find(file => {
           var firstLink = file.path.split(".");
@@ -153,7 +131,6 @@ const ObjectStudy = ({
     } catch (error) {
       let data = await read(SHEMAS_NAME.WORDITEM);
       await deleteRealm(data);
-      console.log("Error geFilePath", error);
     }
   }
 
@@ -293,12 +270,10 @@ const LearnItem = () => {
       if (dataPath && dataPath.length > 0) {
         setLoading(false);
         _learnItems = dataPath;
-        console.log("has dataPath");
         setLearnItems(dataPath);
         // load ảnh
         handleLoadImage(_learnItems);
       } else {
-        console.log("no data");
         const endPoint = "http://aigle.blife.ai/taoItems/Items/getOntologyData";
         const cookie = await AsyncStorage.getItem("@cookie");
         const response = await Axios.get(endPoint, {
@@ -373,7 +348,6 @@ const LearnItem = () => {
         // save file image
         if (singleLinkFile.linkImg) {
           const tailBase64Img = await getLinkFile(singleLinkFile.linkImg);
-          console.log("save image");
           await fs.mkdir(fs.DocumentDirectoryPath + `/images/${he.decode(route.params.labelParent)}/${he.decode(route.params.title)}`);
           await fs.writeFile(fs.DocumentDirectoryPath + `/images/${he.decode(route.params.labelParent)}/${he.decode(route.params.title)}/${singleLinkFile.label}.${tailBase64Img.tail}`, tailBase64Img.base64, "base64")
         }
@@ -381,7 +355,6 @@ const LearnItem = () => {
         // save file audio
         if (singleLinkFile.linkAudio) {
           const tailBase64Audio = await getLinkFile(singleLinkFile.linkAudio);
-          console.log("save audio");
           await fs.mkdir(fs.DocumentDirectoryPath + `/audios/${he.decode(route.params.labelParent)}/${he.decode(route.params.title)}`);
           await fs.writeFile(fs.DocumentDirectoryPath + `/audios/${he.decode(route.params.labelParent)}/${he.decode(route.params.title)}/${singleLinkFile.label}.${tailBase64Audio.tail}`, tailBase64Audio.base64, "base64")
         }
@@ -389,7 +362,6 @@ const LearnItem = () => {
         //save file video
         if (singleLinkFile.linkVideo) {
           const tailBase64Video = await getLinkFile(singleLinkFile.linkVideo)
-          console.log("save video");
           await fs.mkdir(fs.DocumentDirectoryPath + `/videos/${he.decode(route.params.labelParent)}/${he.decode(route.params.title)}`);
           await fs.writeFile(fs.DocumentDirectoryPath + `/videos/${he.decode(route.params.labelParent)}/${he.decode(route.params.title)}/${singleLinkFile.label}.${tailBase64Video.tail}`, tailBase64Video.base64, "base64")
         }

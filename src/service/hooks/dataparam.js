@@ -31,7 +31,6 @@ const getConfigs = async (questionEndpoint) => {
 
 export default async (isReload, uri) => {
   if (isReload || !Object.values(configs).filter(val => val).length) {
-    console.log("call api getConfigs");
     const newConfigs = await getConfigs(uri);
     Object.assign(configs, newConfigs)
   }

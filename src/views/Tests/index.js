@@ -103,7 +103,6 @@ const TabUnfinish = ({
   }
 
   const _onPress = (apiQuestion) => {
-    console.log("apiQuestion", apiQuestion);
     navigation.navigate(STARTTEST, {
       apiQuestion: apiQuestion
     })

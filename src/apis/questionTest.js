@@ -62,11 +62,6 @@ export const apiQuestionTest = async ({
   itemDefinition
 }) => {
   try {
-    console.log("getItem testDefinition", testDefinition);
-    console.log("getItem testCompilation", testCompilation);
-    console.log("getItem serviceCallId", serviceCallId);
-    console.log("getItem itemDefinition", itemDefinition);
-    console.log("token", token);
     const endPoint = "http://aigle.blife.ai/taoQtiTest/Runner/getItem";
     const cookie = await AsyncStorage.getItem("@cookie");
     const response2 = await Axios.get(endPoint, {

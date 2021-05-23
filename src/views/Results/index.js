@@ -19,16 +19,13 @@ export default () => {
   });
 
   useEffect(() => {
-    console.log("route", route);
     loadResult(route.params.name)
   }, [])
 
   const loadResult = async (param) => {
     try {
       setLoading(true);
-      console.log("router attributes", param);
       const dataUri = param.attributes["data-uri"];
-      console.log("dataUri loadResult", dataUri);
       const data = await getUserResults(dataUri);
       _readResult(data);
       setLoading(false);
@@ -39,7 +36,6 @@ export default () => {
   }
 
   _readResult = (result) => {
-    console.log("readResult", result.data);
     setDataResult(result.data);
   }
 

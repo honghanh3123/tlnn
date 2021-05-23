@@ -7,7 +7,6 @@ const configs = {
 
 const getConfigs = async () => {
   const response = await getOntologyData();
-  console.log("response", response);
   let attributes = response.tree.attributes;
   let children = response.tree.children;
   if(children && children.length > 0){

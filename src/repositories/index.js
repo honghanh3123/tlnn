@@ -73,7 +73,6 @@ export const deleteRealm = async (task) => {
 export const deleteById = async (schemaName, id) => {
   const realm = await getRealm();
   const tasks = await read(schemaName);
-  console.log("tasks", tasks);
   const task = tasks.find(item => item._id == id)
   realm.write(() => {
     // Delete the task from the realm.

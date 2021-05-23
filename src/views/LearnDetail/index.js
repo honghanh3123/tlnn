@@ -75,8 +75,6 @@ const LearnDetail = () => {
 
   const loadDataDetail = async (param) => {
     try {
-      console.log("detail", param);
-      console.log("data-uri", param.attributes["data-uri"]);
       setLoading(true);
       const endPoint = "http://aigle.blife.ai/taoItems/Items/getOntologyData";
       const cookie = await AsyncStorage.getItem("@cookie");
@@ -97,7 +95,6 @@ const LearnDetail = () => {
           'selected': "http_2_aigle_0_blife_0_ai_1_Aigle_0_rdf_3_i161762021751478855"
         }
       })
-      console.log("getDetailLearn", response.data.tree);
       _readLearnDetail(response.data.tree);
       setLoading(false);
     } catch (error) {
@@ -121,15 +118,11 @@ const LearnDetail = () => {
           }
         })
       })
-      console.log("LearnDetail _dataStudy", _dataStudy);
-
       setDataStudy(_dataStudy)
     }
   }
 
   const _onPress = (item) => {
-    console.log("item working");
-    console.log("labelParent detail", route.params.title);
     navigation.navigate(LEARNITEM, {
       detail: item,
       title: item.label,

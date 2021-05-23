@@ -93,7 +93,6 @@ export default ({
   const _onPress = async () => {
     const data = await handleMoveItem();
     if (data && data.success) {
-      console.log("Lưu thành công!!");
       onNextQuestion(data.testContext.itemIdentifier, data.token);
     } else {
       console.log("Lưu thất bại!!");
@@ -103,7 +102,6 @@ export default ({
   const _onPressEnd = async () => {
     const data = await handleMoveItem();
     if (data && data.success) {
-      console.log("Lưu thành công!!");
       hanleEndTest();
     } else {
       console.log("Lưu thất bại!!");

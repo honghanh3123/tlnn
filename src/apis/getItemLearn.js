@@ -22,7 +22,6 @@ export const getItemData = async (uri) => {
       }
     })
 
-    // console.log("getItemData", response);
     return response.data;
   } catch (error) {
     console.log("\n\n\n\n\n\n\n\nError getItemData:", error.response.data)

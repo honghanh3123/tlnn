@@ -38,7 +38,6 @@ export default () => {
           itemDefinition: "item-1"
         }
       })
-      console.log("\n\n\n", response.data)
     } catch (error) {
       console.log("\n\n\n", error.response.data)
     }
@@ -47,10 +46,10 @@ export default () => {
     <View style={styles.wrapper}>
       <View style={styles.wrap_user_info}>
         <View style={styles.avata_user}>
-          <Text style={{ fontSize: 80, color: "#e6e2e2" }}>P</Text>
+          <Text style={{ fontSize: 80, color: "#e6e2e2" }}>L</Text>
         </View>
         <View style={{marginTop: 15}}>
-          <Text style={{ fontSize: 24,color: "#194960" }}>Nguyễn Thị Hồng Hạnh</Text>
+          <Text style={{ fontSize: 24,color: "#194960" }}>Vệ Lâm Lang</Text>
         </View>
         <View style={{marginTop: 10}}>
           <Text style={{color: "#194960"}}>nhhanh.99@gmail.com</Text>

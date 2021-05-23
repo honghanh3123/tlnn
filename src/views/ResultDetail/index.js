@@ -23,8 +23,6 @@ export default () => {
 
   const loadDetailResult = async (param) => {
     const data = new FormData();
-    console.log("classUri", param.classUri);
-    console.log("id", param.detail.id);
     data.append("classUri", param.classUri);
     data.append("id", param.detail.id);
     const cookie = await AsyncStorage.getItem("@cookie");
@@ -63,7 +61,6 @@ export default () => {
               .firstChild.data;
 
             maxScore = Number(maxScore);
-            console.log("maxScore", maxScore);
             let response = tbody
               .getElementsByTagName('tr')[3]
               .getElementsByClassName('dataResult')[0]
@@ -81,9 +78,6 @@ export default () => {
           }
         }
 
-        console.log("totalScore", totalScore);
-        console.log("totalMaxScore", totalMaxScore);
-        console.log("results", results);
         setTotalMaxScore(totalMaxScore);
         setTotalScore(totalScore);
       }

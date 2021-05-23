@@ -35,8 +35,6 @@ export default () => {
   const loadResult = async (data) => {
     try {
       const data = await read(SHEMAS_NAME.WORDDIR);
-      // const del = await deleteRealm(data);
-      console.log("data WORDDIR", data);
       if (data && data.length > 0) {
         setLoading(false);
         const dataDB = data.map(element => ({
@@ -99,7 +97,6 @@ export default () => {
         })
       })
       setDataStudy(_dataStudy);
-      console.log("dataStudy before", _dataStudy[0]);
 
       const bulkCreateds = await bulkCreate(SHEMAS_NAME.WORDDIR, _dataStudy.map(item => ({
         ...item,
@@ -108,7 +105,6 @@ export default () => {
         childrens: JSON.stringify(item.childrens)
       })))
 
-      console.log("\n\n\n items", bulkCreateds, "\n\n\n");
     }
   }
 
@@ -127,11 +123,9 @@ export default () => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     const array = [...dataStudy];
     let children;
-    console.log("array[index]", array[index]);
     if (!array[index]['childrens'] || !array[index]['childrens'].length) {
       children = await loadDataDetail(item);
     }
-    console.log("children", children);
     if (children && children.length > 0) {
       array[index]['childrens'] = children;
       const dataUpdate = update(SHEMAS_NAME.WORDDIR, (words) => words.filtered(`_id = '${item._id}'`), { childrens: JSON.stringify(children) });
@@ -144,7 +138,6 @@ export default () => {
   const loadDataDetail = async (param) => {
     try {
       setLoading(true);
-      console.log("param", param);
       const endPoint = "http://aigle.blife.ai/taoItems/Items/getOntologyData";
       const cookie = await AsyncStorage.getItem("@cookie");
       const response = await Axios.get(endPoint, {
@@ -165,7 +158,6 @@ export default () => {
         }
       })
       setLoading(false);
-      console.log("tree", response.data);
       return _readLearnDetail(response.data.tree);
     } catch (error) {
       setLoading(false);
