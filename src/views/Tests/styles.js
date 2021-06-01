@@ -6,7 +6,7 @@ export default StyleSheet.create({
     display: "flex",
     alignItems: "center",
     width: "100%",
-    height: "100%"
+    height: "100%",
   },
 
   wrapperTitle: {
@@ -42,7 +42,6 @@ export default StyleSheet.create({
   },
 
   wrapperTest: {
-    marginTop: 20,
     width: "100%",
     height: "100%",
     backgroundColor: "#fff"
@@ -57,7 +56,6 @@ export default StyleSheet.create({
     marginHorizontal: 24,
     display: "flex",
     flexDirection: "row",
-    marginBottom: 12,
     position: "relative",
     padding: 15
   },
@@ -95,6 +93,7 @@ export default StyleSheet.create({
 
   layout: {
     width: "100%",
-    height: 0.8*screenHeight - 60
+    // height: 0.8*screenHeight - 60
+    marginBottom: 100
   }
 })
