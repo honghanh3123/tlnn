@@ -42,7 +42,7 @@ const TabTest = ({
         <View style={{ width: "100%", display: "flex", alignItems: "flex-end" }}>
           <Button
             onPress={() => _onPress(item.apiQuestion)}
-            style={[styles.btnFooter, {display: type == 3 ? "none" : "flex"}]}
+            style={[styles.btnFooter, { display: type == 3 ? "none" : "flex" }]}
           >
             {"Bắt đầu"}
           </Button>
@@ -62,7 +62,7 @@ const TabTest = ({
           <List
             data={dataResource}
             renderItem={renderItem}
-            style={{ backgroundColor: "white" }}
+            style={{ backgroundColor: "transparent" }}
             ItemSeparatorComponent={() => (<View style={{ margin: 8 }} />)}
             ListHeaderComponent={() => (<View style={{ margin: 8 }} />)}
             ListFooterComponent={() => (<View style={{ margin: 8 }} />)}
@@ -109,30 +109,25 @@ export default () => {
   }
 
   return (
-    <Layout level="1" style={styles.wrapper}>
-      <Text style={styles.wrapperTitle}>
-        Bài kiểm tra
-      </Text>
-      <TabView
-        selectedIndex={selectedIndex}
-        onSelect={index => setSelectedIndex(index)}
-        style={{ width: "100%", height: "100%" }}>
-        <Tab title='Đang làm'>
-          <Layout level="1" style={styles.layout}>
-            <TabTest dataExam={dataExam} type={1} loading={loading} />
-          </Layout>
-        </Tab>
-        <Tab title='Chưa làm'>
-          <Layout level="1" style={styles.layout}>
-            <TabTest dataExam={dataExam} type={2} loading={loading} />
-          </Layout>
-        </Tab>
-        <Tab title='Hoàn thành'>
-          <Layout level="1" style={styles.layout}>
-            <TabTest dataExam={dataExam} type={3} loading={loading} />
-          </Layout>
-        </Tab>
-      </TabView>
-    </Layout>
+    <TabView
+      selectedIndex={selectedIndex}
+      onSelect={index => setSelectedIndex(index)}
+      style={{ width: "100%", height: "100%" }}>
+      <Tab title='Đang làm'>
+        <Layout level="2" style={styles.layout}>
+          <TabTest dataExam={dataExam} type={1} loading={loading} />
+        </Layout>
+      </Tab>
+      <Tab title='Chưa làm'>
+        <Layout level="2" style={styles.layout}>
+          <TabTest dataExam={dataExam} type={2} loading={loading} />
+        </Layout>
+      </Tab>
+      <Tab title='Hoàn thành'>
+        <Layout level="2" style={styles.layout}>
+          <TabTest dataExam={dataExam} type={3} loading={loading} />
+        </Layout>
+      </Tab>
+    </TabView>
   )
 }

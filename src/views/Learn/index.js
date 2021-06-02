@@ -22,6 +22,7 @@ import he from "he";
 import DropDown from "components/DropDown";
 import { create, read, deleteRealm, deleteById, update, bulkCreate } from "repositories";
 import { SHEMAS_NAME } from "consts/schema";
+
 export default () => {
   const navigation = useNavigation();
   const route = useRoute();
