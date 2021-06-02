@@ -37,7 +37,8 @@ export const apiInitTest = async ({
     const paramTest = {
       token: response1.data.token,
       itemIdentifier: response1.data.testContext.itemIdentifier,
-      totalQuestion: response1.data.testMap.stats.total | 0
+      totalQuestion: response1.data.testMap.stats.total | 0,
+      totalAnswer: response1.data.testMap.stats.answered | 0
     }
 
     return paramTest;

@@ -19,6 +19,14 @@ export const apiMoveTest = async (token, dataParam, {
     data.append("direction", "next");
     data.append("scope", "item");
     data.append("itemDuration", itemDuration);
+    console.log("data", data);
+    console.log("token", token);
+    console.log("query param", {
+      testDefinition: dataParam.testDefinition, 
+      testCompilation: dataParam.testCompilation, 
+      testServiceCallId: dataParam.serviceCallId,
+      itemDefinition: dataParam.itemDefinition, 
+    })
     const cookie =await AsyncStorage.getItem("@cookie");
     const endPoint = "http://aigle.blife.ai/taoQtiTest/Runner/move";
     const response = await Axios.post(endPoint, data, {

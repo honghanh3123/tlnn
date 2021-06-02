@@ -17,6 +17,8 @@ export default () => {
     "ttaker": ""
   });
 
+  const [results, setResults] = useState([]);
+
   useEffect(() => {
     loadDetailResult(route.params)
   }, [])
@@ -80,6 +82,8 @@ export default () => {
 
         setTotalMaxScore(totalMaxScore);
         setTotalScore(totalScore);
+        setResults(results);
+        console.log("result", results);
       }
     } catch (error) {
       console.log("Lỗi đọc html _readResult", error);
@@ -103,10 +107,30 @@ export default () => {
         totalMaxScore ? (
           <View style={styles.info_item}>
             <View style={{ marginLeft: 10 }}>
-              <Text style={{ fontSize: 16 }}>Phần trăm trả lời đúng: {totalScore / totalMaxScore}</Text>
+              <Text style={{ fontSize: 16 }}>Phần trăm trả lời đúng: {Math.floor(totalScore*100 / totalMaxScore)} %</Text>
             </View>
           </View>
         ) : (<></>)
+      }
+      <View style={{marginLeft: 10, marginTop: 20, alignItems: "center", width: 60, borderBottomWidth: 1, borderStyle: "solid", borderBottomColor: "#0072bc"}}>
+        <Text style={{fontSize: 15}}>Chi tiết</Text>
+      </View>
+      {
+        results && results.length > 0 ? results.map((result, index) => (
+          <View key={index} style={[styles.info_item, {justifyContent: "space-between", width: "80%", marginLeft: "10%"}]}>
+            <View><Text>Câu {index + 1}</Text></View>
+            <View>
+              {
+                result.score == 1 ? (
+                  <View>
+                    <Text>Đúng</Text>
+                  </View>
+                )
+                : (<View><Text>Sai</Text></View>)
+              }
+            </View>
+          </View>
+        )): null
       }
     </View>
   )

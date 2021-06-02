@@ -27,27 +27,14 @@ export default ({
       })
 
       if (answerChoice && answerChoice.length > 0) {
-        let itemResponse = {
-          "RESPONSE":
-          {
-            "list":
-            {
-              "identifier": answerChoice
-            }
-          }
-        }
-
-        let itemState = {
-          "RESPONSE":
-          {
-            "response":
-            {
-              "list":
-              {
-                "identifier": answerChoice
-              }
-            }
-          }
+        let itemResponse, itemState;
+        if(dataQuestion.maxChoices == 1){
+          itemResponse = {"RESPONSE":{"base":{"identifier": answerChoice[0]}}};
+          itemState = {"RESPONSE":{"response":{"base":{"identifier":answerChoice[0]}},"order":dataQuestion.orders}};
+        }else{
+          itemResponse = {"RESPONSE":{"list":{"identifier":answerChoice}}}
+          // itemState = {"RESPONSE":{"response":{"list":{"identifier":answerChoice}},"order":dataQuestion.orders}}
+          itemState = {"RESPONSE":{"response":{"list":{"identifier":answerChoice}}}}
         }
 
         let itemDuration = Date.now() - startTime;

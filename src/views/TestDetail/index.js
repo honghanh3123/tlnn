@@ -45,6 +45,7 @@ export default () => {
           serviceCallId: dataParam.serviceCallId
         });
         setTotalQuestion(paramTest.totalQuestion);
+        setQuestionIndex(paramTest.totalAnswer);
         itemIdentifier = paramTest.itemIdentifier;
         token = paramTest.token;
       }
@@ -82,6 +83,7 @@ export default () => {
         let ele = Object.values(elements)[0].prompt.elements;
         let attr = Object.values(ele);
         if (attr && attr.length > 0) {
+          //nếu nội dung gợi ý cho câu hỏi có hình ảnh hay âm thanh thì lưu file để gọi khi view
           question.label = question.label.replace("{{" + attr[0].serial + "}}", "").trim();
           let typeLink = attr[0].attributes.type.split("/")[0];
           let { tail, base64 } = await getLinkFile(data['baseUrl'] + attr[0].attributes.data);
@@ -96,9 +98,22 @@ export default () => {
           }
         }
       }
+      console.log("yes");
+      var maxChoices = 0;
+      if(qtiClass == "choiceInteraction"){
+        // check xem câu hỏi lựa chọn 1 đáp án hay nhiều đáp án
+        var attributes = Object.values(elements)[0].attributes;
+        if(attributes){
+          maxChoices = attributes.maxChoices;
+        }
+      }
+
       let choices = Object.values(elements)[0].choices;
       let objChoises = Object.values(choices);
-
+      var orders = [];
+      objChoises.map(item => {
+        orders.push(item.identifier); // id đáp án để chọn choice_1
+      });
       let answers = await Promise.all(objChoises.map(async item => {
         let answer = {};
         let elements = Object.values(item.body.elements);
@@ -124,7 +139,6 @@ export default () => {
       if (Object.values(elements)[0] && Object.values(elements)[0].body && Object.values(elements)[0].body.body) {
         suggestQuestion = Object.values(elements)[0].body.body;
       }
-
       setDataQuestion({
         apiQuestion: route.params.apiQuestion,
         itemIdentifier: data.itemIdentifier,
@@ -134,7 +148,9 @@ export default () => {
         question: question,
         answers: answers,
         paramTest: dataParam,
-        suggestQuestion: suggestQuestion
+        suggestQuestion: suggestQuestion,
+        maxChoices: maxChoices,
+        orders: orders
       });
     } catch (error) {
       setLoading(false)

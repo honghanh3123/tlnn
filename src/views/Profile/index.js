@@ -52,7 +52,7 @@ export default () => {
           <Text style={{ fontSize: 24,color: "#194960" }}>Vệ Lâm Lang</Text>
         </View>
         <View style={{marginTop: 10}}>
-          <Text style={{color: "#194960"}}>nhhanh.99@gmail.com</Text>
+          <Text style={{color: "#194960"}}>velamlang.99@gmail.com</Text>
         </View>
       </View>
       <View style={styles.info_item}>
