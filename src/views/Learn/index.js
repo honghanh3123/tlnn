@@ -199,7 +199,11 @@ export default () => {
             <View>
               <View style={{ flexDirection: 'row', paddingRight: 10, paddingLeft: 0, paddingTop: 0 }}>
               </View>
-              <ScrollView>
+              <ScrollView
+                style={{
+                  marginBottom: 200
+                }}
+              >
                 {dataStudy.map((item, key) => (
                   <DropDown
                     key={item.label}
