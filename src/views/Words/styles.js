@@ -34,7 +34,8 @@ export default StyleSheet.create({
     // minHeight: 100,
     marginBottom: 12,
     position: "relative",
-    padding: 15
+    padding: 15,
+    backgroundColor: "white"
   },
 
   testBorderLeftBlue: {

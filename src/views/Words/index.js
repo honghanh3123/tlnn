@@ -70,9 +70,6 @@ export default () => {
 
   return (
     <View style={styles.wrapper}>
-      <Text style={styles.wrapperTitle}>
-        Kết quả
-      </Text>
       {
         loading ? (
           <View style={{ width: "100%", height: "50%", alignItems: "center", justifyContent: "center" }}>
@@ -80,34 +77,28 @@ export default () => {
             <Text style={{ color: "#0072bc", marginTop: 20 }}>Vui lòng chờ ít phút.</Text>
           </View>
         ) : (
-            <View style={styles.wrapperTest}>
-              <FlatList
-                keyExtractor={item => item.attributes.id}
-                data={result.dataResource}
-                // refreshControl={(
-                //   <RefreshControl
-                //     colors={["#0082ff"]}
-                //     refreshing={result.loading}
-                //   />
-                // )}
-                renderItem={({ item }) => {
-                  return <View>
-                    <View style={styles.testItem}>
-                      <View style={styles.testBorderLeftBlue}></View>
-                      <View style={styles.testContent}>
-                        <Text style={styles.testTitleBlue}>{he.decode(item.data)}</Text>
-                        <View style={{ width: "100%", display: "flex", alignItems: "flex-end" }}>
-                          <Button style={styles.btnFooter} onPress={() => _handleViewResult(item)}>
-                            Xem kết quả
+          <View style={styles.wrapperTest}>
+            <FlatList
+              keyExtractor={item => item.attributes.id}
+              data={result.dataResource}
+              renderItem={({ item }) => {
+                return (
+                  <View style={styles.testItem}>
+                    <View style={styles.testBorderLeftBlue}></View>
+                    <View style={styles.testContent}>
+                      <Text style={styles.testTitleBlue}>{he.decode(item.data)}</Text>
+                      <View style={{ width: "100%", display: "flex", alignItems: "flex-end" }}>
+                        <Button style={styles.btnFooter} onPress={() => _handleViewResult(item)}>
+                          Xem kết quả
                           </Button>
-                        </View>
                       </View>
                     </View>
                   </View>
-                }}
-              />
-            </View>
-          )
+                )
+              }}
+            />
+          </View>
+        )
       }
     </View>
   )

@@ -42,11 +42,22 @@ const LearnIcon = (props) => (
 )
 
 const TestStackNavigation = () => (
-  <Stack.Navigator>
+  <Stack.Navigator
+    screenOptions={{
+      headerTitleAlign: "center"
+    }}
+  >
     {/* <Stack.Screen name="VoiceTest" component={VoiceTest} /> */}
-    <Stack.Screen name={TESTS} component={Tests} options={{
-      header: BlankHeader
-    }} />
+    <Stack.Screen
+      name={TESTS}
+      component={Tests}
+      options={{
+        headerStyle: {
+          elevation: 0, // remove shadow on Android
+          shadowOpacity: 0, // remove shadow on iOS
+        },
+      }}
+    />
     <Stack.Screen name={STARTTEST} component={TestDetail} />
     <Stack.Screen name={RESULTS} component={Results} />
     <Stack.Screen name={RESULTDETAIL} component={ResultDetail} />
@@ -54,7 +65,11 @@ const TestStackNavigation = () => (
 )
 
 const LearnStackNavigation = () => (
-  <Stack.Navigator>
+  <Stack.Navigator
+    screenOptions={{
+      headerTitleAlign: "center"
+    }}
+  >
     <Stack.Screen name={LEARN} component={Learn}></Stack.Screen>
     <Stack.Screen {...LearnDetail} />
     <Stack.Screen {...LearnItem} />
@@ -62,10 +77,12 @@ const LearnStackNavigation = () => (
 )
 
 const ResultStackNavigation = () => (
-  <Stack.Navigator>
-    <Stack.Screen name={WORDS} component={Words} options={{
-      header: BlankHeader
-    }} />
+  <Stack.Navigator
+    screenOptions={{
+      headerTitleAlign: "center"
+    }}
+  >
+    <Stack.Screen name={WORDS} component={Words} options={{ title: "Kết quả" }} />
     <Stack.Screen name={RESULTS} component={Results} />
     <Stack.Screen name={RESULTDETAIL} component={ResultDetail} />
   </Stack.Navigator>

@@ -7,13 +7,16 @@ export default StyleSheet.create({
     alignItems: "center",
     width: "100%",
     height: "100%",
+    backgroundColor: "transparent"
   },
 
   wrapperTitle: {
-    marginTop: 20,
-    marginBottom: 20,
+    width: "100%",
+    paddingVertical: 20,
     fontSize: 22,
-    fontWeight: "bold"
+    fontWeight: "bold",
+    backgroundColor: "white",
+    textAlign: "center"
   },
 
   inlineButton: {
@@ -44,7 +47,7 @@ export default StyleSheet.create({
   wrapperTest: {
     width: "100%",
     height: "100%",
-    backgroundColor: "#fff"
+    backgroundColor: "transparent"
     //flex: 1
   },
 
@@ -57,7 +60,8 @@ export default StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     position: "relative",
-    padding: 15
+    padding: 15,
+    backgroundColor: "white"
   },
 
   testBorderLeft: {
@@ -94,6 +98,7 @@ export default StyleSheet.create({
   layout: {
     width: "100%",
     // height: 0.8*screenHeight - 60
-    marginBottom: 100
+    marginBottom: 36,
+    backgroundColor: "transparent"
   }
 })

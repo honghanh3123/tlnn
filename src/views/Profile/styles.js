@@ -5,7 +5,8 @@ const screenHeight = Dimensions.get("screen").height
 
 export default StyleSheet.create({
   wrapper: {
-    margin: 10
+    margin: 10,
+    flexDirection: "column"
   },
 
   wrap_user_info: {
@@ -15,7 +16,8 @@ export default StyleSheet.create({
     alignItems: "center", 
     height: 280,
     backgroundColor: "#fff",
-    borderRadius: 8
+    borderRadius: 8,
+    marginBottom: 8
   },
 
   avata_user: {

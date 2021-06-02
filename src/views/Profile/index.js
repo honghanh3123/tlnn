@@ -1,5 +1,5 @@
 import React, { Fragment, useContext } from 'react';
-import { Button, Icon } from '@ui-kitten/components';
+import { Button, Icon, ListItem } from '@ui-kitten/components';
 import { View, Text } from 'react-native';
 import styles from './styles';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -48,32 +48,62 @@ export default () => {
         <View style={styles.avata_user}>
           <Text style={{ fontSize: 80, color: "#e6e2e2" }}>L</Text>
         </View>
-        <View style={{marginTop: 15}}>
-          <Text style={{ fontSize: 24,color: "#194960" }}>Vệ Lâm Lang</Text>
+        <View style={{ marginTop: 15 }}>
+          <Text style={{ fontSize: 24, color: "#194960" }}>Vệ Lâm Lang</Text>
         </View>
-        <View style={{marginTop: 10}}>
-          <Text style={{color: "#194960"}}>nhhanh.99@gmail.com</Text>
+        <View style={{ marginTop: 10 }}>
+          <Text style={{ color: "#194960" }}>nhhanh.99@gmail.com</Text>
         </View>
       </View>
-      <View style={styles.info_item}>
+      {/* <View style={styles.info_item}>
         <Icon style={{ width: 32, height: 32 }}
           fill="#194960"
           name="people-outline"></Icon>
-        <View style={{marginLeft: 10}}>
-          <Text style={{color: "#194960", fontSize: 16}}>Nhóm: Nhóm căn bản</Text>
+        <View style={{ marginLeft: 10 }}>
+          <Text style={{ color: "#194960", fontSize: 16 }}>Nhóm: Nhóm căn bản</Text>
         </View>
-      </View>
-      <View style={styles.info_item}>
+      </View> */}
+      <ListItem
+        accessoryLeft={(leftProps) => (
+          <Icon
+            {...leftProps}
+            style={{ width: 32, height: 32, ...leftProps?.style }}
+            name='people-outline'
+          />
+        )}
+        title={<Text style={{ color: "#194960", fontSize: 16 }}>Nhóm: Nhóm căn bản</Text>}
+        disabled
+        style={{
+          marginBottom: 8,
+          borderRadius: 8
+        }}
+      />
+      <ListItem
+        accessoryLeft={(leftProps) => (
+          <Icon
+            {...leftProps}
+            style={{ width: 32, height: 32, ...leftProps?.style }}
+            name='log-in-outline'
+          />
+        )}
+        title={<Text style={{ color: "#194960", fontSize: 16 }}>Đăng xuất</Text>}
+        onPress={_logout}
+        style={{
+          marginBottom: 8,
+          borderRadius: 8
+        }}
+      />
+      {/* <View style={styles.info_item}>
         <Icon
           style={{ width: 32, height: 32 }}
           fill='#194960'
           name='log-in-outline'
           onPress={_logout}
         />
-        <View style={{marginLeft: 10}}>
-          <Text style={{color: "#194960", fontSize: 16}}>Đăng xuất</Text>
+        <View style={{ marginLeft: 10 }}>
+          <Text style={{ color: "#194960", fontSize: 16 }}>Đăng xuất</Text>
         </View>
-      </View>
+      </View> */}
     </View>
   )
 }
