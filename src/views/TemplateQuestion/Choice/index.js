@@ -43,6 +43,8 @@ export default ({
           testCompilation: dataQuestion.paramTest.testCompilation,
           serviceCallId: dataQuestion.paramTest.serviceCallId
         };
+        console.log("itemResponse", itemResponse);
+        console.log("itemState", itemState);
         dataParam.itemDefinition = dataQuestion.itemIdentifier;
         const data = await moveitem(dataQuestion.token, dataParam, {
           "itemResponse": JSON.stringify(itemResponse),
@@ -114,6 +116,15 @@ export default ({
             name='volume-up-outline'
             onPress={() => { playSound(dataQuestion.question.linkAudio) }}
           />
+        ) : dataQuestion.question.linkImg ? (
+          <View style={{backgroundColor: "gray", marginBottom: 20}}>
+            <Image
+              style={{ height: 130, width: 130 }}
+              source={{
+                uri: dataQuestion.question.linkImg
+              }}
+            />
+          </View>
         ) : (<></>)
       }
       <View style={styles.wrapContent}>

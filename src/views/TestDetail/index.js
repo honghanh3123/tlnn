@@ -78,6 +78,7 @@ export default () => {
         linkAudio: "",
         linkVideo: ""
       };
+      
       question.label = Object.values(elements)[0].prompt.body;
       if (Object.values(elements)[0].prompt.elements) {
         let ele = Object.values(elements)[0].prompt.elements;
@@ -86,15 +87,24 @@ export default () => {
           //nếu nội dung gợi ý cho câu hỏi có hình ảnh hay âm thanh thì lưu file để gọi khi view
           question.label = question.label.replace("{{" + attr[0].serial + "}}", "").trim();
           let typeLink = attr[0].attributes.type.split("/")[0];
-          let { tail, base64 } = await getLinkFile(data['baseUrl'] + attr[0].attributes.data);
+          var fileName;
+          if(attr[0].attributes.data){
+            fileName = attr[0].attributes.data;
+          }else{
+            fileName = attr[0].attributes.src;
+          }
+          let { tail, base64 } = await getLinkFile(data['baseUrl'] + fileName);
           if (typeLink == "audio") {
             await fs.mkdir(fs.DocumentDirectoryPath + `/question/audios`);
-            await fs.writeFile(fs.DocumentDirectoryPath + `/question/audios/${attr[0].attributes.data}`, base64, "base64");
-            question.linkAudio = fs.DocumentDirectoryPath + `/question/audios/${attr[0].attributes.data}`;
+            await fs.writeFile(fs.DocumentDirectoryPath + `/question/audios/${fileName}`, base64, "base64");
+            question.linkAudio = fs.DocumentDirectoryPath + `/question/audios/${fileName}`;
           } else if (typeLink == "video") {
             await fs.mkdir(fs.DocumentDirectoryPath + `/question/video`);
-            await fs.writeFile(fs.DocumentDirectoryPath + `/question/video/${attr[0].attributes.data}`, base64, "base64");
-            question.linkVideo = fs.DocumentDirectoryPath + `/question/video/${attr[0].attributes.data}`;
+            await fs.writeFile(fs.DocumentDirectoryPath + `/question/video/${fileName}`, base64, "base64");
+            question.linkVideo = fs.DocumentDirectoryPath + `/question/video/${fileName}`;
+          }else{
+            let { tail, base64 } = await getLinkFile(data['baseUrl'] + fileName);
+            question.linkImg = `data:image/${tail};base64,${base64}`;
           }
         }
       }
