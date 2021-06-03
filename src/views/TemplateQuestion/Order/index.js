@@ -1,10 +1,10 @@
 import React, { Fragment, useState, useEffect, useMemo, useRef } from 'react';
-import { View, Text, TouchableNativeFeedback, TouchableHighlight } from 'react-native';
-import { Button, Spinner, Avatar } from '@ui-kitten/components';
+import { View, Text, TouchableNativeFeedback, TouchableHighlight, Image } from 'react-native';
+import { Button, Spinner, Avatar, Icon } from '@ui-kitten/components';
 import styles from './styles';
 import { moveitem } from 'service/moveitem';
 import dataparam from 'service/hooks/dataparam';
-
+import Sound from 'react-native-sound';
 export default ({
   dataQuestion,
   onNextQuestion,
@@ -108,10 +108,35 @@ export default ({
     }
   }
 
+  const playSound = (path) => {
+    const sound = new Sound(path, '', () => {
+      sound.play();
+    })
+  }
+
   const selectdValues = useMemo(() => Object.values(selected), [selected])
   return (
     <View style={styles.wrapper}>
       <Text style={styles.question}>{dataQuestion.question.label || ""}</Text>
+      {
+        dataQuestion.question.linkAudio ? (
+          <Icon
+            style={{ width: 32, height: 32 }}
+            fill='#0072bc'
+            name='volume-up-outline'
+            onPress={() => { playSound(dataQuestion.question.linkAudio) }}
+          />
+        ) : dataQuestion.question.linkImg ? (
+          <View style={{backgroundColor: "gray", marginBottom: 20}}>
+            <Image
+              style={{ height: 130, width: 130 }}
+              source={{
+                uri: dataQuestion.question.linkImg
+              }}
+            />
+          </View>
+        ) : (<></>)
+      }
       <View style={styles.wrapContent}>
         <View style={styles.wrapItem}>
           {
