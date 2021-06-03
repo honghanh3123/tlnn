@@ -1,6 +1,6 @@
 import React, { Fragment, useState, useEffect } from 'react';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { View, Text } from 'react-native';
+import { View, Text, ScrollView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Axios from 'axios';
 import { DOMParser } from 'react-native-html-parser';
@@ -107,31 +107,39 @@ export default () => {
         totalMaxScore ? (
           <View style={styles.info_item}>
             <View style={{ marginLeft: 10 }}>
-              <Text style={{ fontSize: 16 }}>Phần trăm trả lời đúng: {Math.floor(totalScore*100 / totalMaxScore)} %</Text>
+              <Text style={{ fontSize: 16 }}>Phần trăm trả lời đúng: {Math.floor(totalScore * 100 / totalMaxScore)} %</Text>
             </View>
           </View>
         ) : (<></>)
       }
-      <View style={{marginLeft: 10, marginTop: 20, alignItems: "center", width: 60, borderBottomWidth: 1, borderStyle: "solid", borderBottomColor: "#0072bc"}}>
-        <Text style={{fontSize: 15}}>Chi tiết</Text>
+      <View style={{ marginLeft: 10, marginTop: 20, alignItems: "center", width: 60, borderBottomWidth: 1, borderStyle: "solid", borderBottomColor: "#0072bc" }}>
+        <Text style={{ fontSize: 15 }}>Chi tiết</Text>
       </View>
-      {
-        results && results.length > 0 ? results.map((result, index) => (
-          <View key={index} style={[styles.info_item, {justifyContent: "space-between", width: "80%", marginLeft: "10%"}]}>
-            <View><Text>Câu {index + 1}</Text></View>
-            <View>
-              {
-                result.score == 1 ? (
-                  <View>
-                    <Text>Đúng</Text>
-                  </View>
-                )
-                : (<View><Text>Sai</Text></View>)
-              }
+      <ScrollView
+        style={{
+          marginTop: 8,
+          marginBottom: 84
+        }}
+      >
+        {
+          results && results.length > 0 ? results.map((result, index) => (
+            <View key={index} style={[styles.info_item, { justifyContent: "space-between", width: "80%", marginLeft: "10%" }]}>
+              <View><Text>Câu {index + 1}</Text></View>
+              <View>
+                {
+                  result.score == 1 ? (
+                    <View>
+                      <Text>Đúng</Text>
+                    </View>
+                  )
+                    : (<View><Text>Sai</Text></View>)
+                }
+              </View>
             </View>
-          </View>
-        )): null
-      }
+          )) : null
+        }
+        <View style={{ margin: 8 }} />
+      </ScrollView>
     </View>
   )
 }
