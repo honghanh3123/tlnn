@@ -13,6 +13,8 @@ export const getExams = async () => {
 			let result = parser.parseFromString(response, "text/html");
 
 			let processExam = [], resultData = [], dataExam;
+			let userName = result.getElementsByClassName('icon-test-taker');
+			console.log("userName", userName);
 			let ul = result.getElementsByClassName('entry-point-box plain');
 			var length = parseInt(ul.$$length);
 			if (length == 2) {

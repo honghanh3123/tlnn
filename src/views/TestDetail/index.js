@@ -133,6 +133,7 @@ export default () => {
           answer.identifier = item.identifier;
           answer.qtiClass = item.qtiClass;
         } else {
+          console.log("elements[0].attributes.type.split", elements[0].attributes);
           let typeLink = elements[0].attributes.type.split("/")[0];
           if (typeLink == "image") {
             let { tail, base64 } = await getLinkFile(data['baseUrl'] + elements[0].attributes.src);
